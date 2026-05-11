@@ -1,9 +1,145 @@
-## 0.2.0 (Unreleased)
-## 0.1.1 (July 06, 2020)
+# Changelog
 
-Recreated provider with Standard Implementation and tests.
-## 0.1.0 (June 20, 2017)
+All notable changes to this provider are documented here.
 
-NOTES:
+Entries for v0.1.0 through v1.0.8 reflect upstream
+`DNSMadeEasy/terraform-provider-dme` history. The primary source is the
+upstream GitHub Release body for each tag; where the upstream Release
+body was empty, a placeholder, or absent, the entry is reconstructed
+from upstream git history and flagged. Dates are the upstream Release
+`published_at` value where available, otherwise the tag commit date.
 
-* Same functionality as that of Terraform 0.9.8. Repacked as part of [Provider Splitout](https://www.hashicorp.com/blog/upcoming-provider-changes-in-terraform-0-10/)
+## Unreleased
+
+### Changed
+- Project housekeeping: README rewritten to remove HashiCorp template
+  chrome and modernize build/usage instructions; CHANGELOG reconstructed
+  from upstream tag history (v0.1.0 through v1.0.8).
+
+### Removed
+- `.travis.yml` (Travis OSS shut down 2021; pinned obsolete tooling).
+- `scripts/gogetcookie.sh` (HashiCorp-internal googlesource cookie hack).
+- `scripts/changelog-links.sh` (hard-coded wrong provider URL; never
+  functional against this repo).
+- `main.tf` (developer scratch file accidentally committed).
+
+## v1.0.8 — 2025-06-26
+
+_Source: upstream GitHub Release notes._
+
+### Changed
+
+- **Resource Behavior Updates:** Updated the `dme_domain` resource to
+  improve user control and predictability for several optional fields:
+  - Fields `gtd_enabled`, `soa_id`, `template_id`, `vanity_id`, and
+    `transfer_acl_id` are no longer `Computed`. Their values are now
+    determined solely by user configuration or explicit defaults.
+  - `gtd_enabled` now defaults to `"false"` if omitted.
+  - If optional IDs (`soa_id`, `template_id`, `vanity_id`,
+    `transfer_acl_id`, `folder_id`) are not set, the provider will not
+    assign custom values, resulting in default platform behavior
+    (e.g., no custom SOA, template, or vanity nameservers).
+  - During updates, these fields are always sent explicitly, ensuring
+    that removal or resetting is reflected in DNS Made Easy.
+- **Improved Consistency:** These changes ensure that resource state in
+  Terraform more reliably matches user configuration, reducing the
+  potential for state drift or unexpected diffs caused by external
+  changes.
+
+### Docs
+
+- Enhanced documentation for `dme_domain` to clarify the default
+  behavior for all optional arguments.
+
+### Migration Note
+
+- **Potential Configuration Churn:** Users upgrading from previous
+  versions may notice that Terraform now manages these fields more
+  strictly. If a field was previously managed implicitly (via remote
+  state or platform defaults), users may need to review and update
+  their configurations to ensure intended behavior.
+
+Related PR: [DNSMadeEasy/terraform-provider-dme#47](https://github.com/DNSMadeEasy/terraform-provider-dme/pull/47).
+
+## v1.0.7 — 2025-02-05
+
+_Source: upstream GitHub Release notes._
+
+### Added
+
+- Optional config parameter to specify a custom API server base URL
+  (DNS Made Easy sandbox or customer-specific endpoint), used instead
+  of the default API server.
+
+### Changed
+
+- Improved validation and plumbing of other config parameters.
+- Improved existing documentation terminology and formatting.
+
+## v1.0.6 — 2022-10-04
+
+_Source: git history; upstream Release body was a tag-name placeholder._
+
+### Changed
+
+- Dependency update; bumped `dme-go-client` (v1.11.2 → v1.11.3).
+- Improved rate-limiter behavior.
+- Adopted Terraform provider environment variable conventions
+  (`DME_API_KEY`, `DME_SECRET_KEY`) — fixes #19. (#40)
+
+## v1.0.5 — 2022-03-28
+
+_Source: upstream GitHub Release notes._
+
+### Fixed
+
+- Compatibility issue with M1 MacBooks (`darwin_arm64`).
+
+## v1.0.4 — 2021-11-16
+
+_Source: upstream GitHub Release notes._
+
+### Fixed
+
+- API rate-limit issue.
+
+## v1.0.3 / v0.1.3 — 2021-10-26 / 2021-03-10
+
+_Source: git history; upstream Release bodies were empty for both tags.
+`v0.1.3` and `v1.0.3` point to the same commit (PR #28); upstream
+retagged 7 months later when the version scheme switched to `v1.x`._
+
+### Fixed
+
+- `dme_dns_record` create failing when `name` was empty (apex record).
+  (#28)
+
+## v0.1.2 — 2020-09-18
+
+_Source: git history; upstream Release body was a tag-name placeholder._
+
+### Added
+
+- `.goreleaser.yml` and GitHub release workflow.
+
+## v0.1.1 — 2020-07-06
+
+_Source: git history; no upstream GitHub Release was published for this tag._
+
+### Changed
+
+- Provider recreated against the modern Terraform plugin SDK with the
+  standard implementation layout.
+- Vendored dependencies refreshed.
+- Acceptance tests added.
+
+## v0.1.0 — 2017-06-20
+
+_Source: git history; no upstream GitHub Release was published for this tag._
+
+### Added
+
+- Initial standalone release. Same functionality as the in-tree
+  `terraform-providers/dme` provider in Terraform 0.9.8, repackaged per
+  the
+  [Provider Splitout](https://www.hashicorp.com/blog/upcoming-provider-changes-in-terraform-0-10/).
