@@ -12,6 +12,12 @@ from upstream git history and flagged. Dates are the upstream Release
 ## Unreleased
 
 ### Changed
+- Bumped minimum Go version to **1.26** (`go.mod` `go` directive).
+  Go 1.23 went out of support when Go 1.25 shipped (Aug 2025); pinning to
+  current keeps the project building on supported toolchains and removes
+  ambiguity about which Go features the provider may use.
+- Release workflow now uses `actions/setup-go@v5` with Go 1.26
+  (upgraded from `@v2`, which is GitHub Actions deprecated).
 - Project housekeeping: README rewritten to remove HashiCorp template
   chrome and modernize build/usage instructions; CHANGELOG reconstructed
   from upstream tag history (v0.1.0 through v1.0.8).

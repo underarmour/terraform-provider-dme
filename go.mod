@@ -1,6 +1,6 @@
 module github.com/terraform-providers/terraform-provider-dme
 
-go 1.23
+go 1.26
 
 require (
 	github.com/DNSMadeEasy/dme-go-client v1.11.6
