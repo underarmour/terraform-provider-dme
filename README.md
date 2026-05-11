@@ -1,18 +1,27 @@
-# DNSMadeEasy Terraform Provider
+# DNSMadeEasy Terraform Provider (Under Armour fork)
 
 Terraform / OpenTofu provider for managing DNS Made Easy resources via the
 [DME REST API v2.0](https://api-docs.dnsmadeeasy.com/).
 
+This is an Under Armour maintained fork of
+[`DNSMadeEasy/terraform-provider-dme`](https://github.com/DNSMadeEasy/terraform-provider-dme).
+It is a drop-in replacement for upstream — same resource types, same
+schema, same behavior — with toolchain modernization and (in v2.x)
+fixes for long-standing read-path drift bugs. Switching forks requires
+exactly one HCL change: `source = "underarmour/dme"`. See
+[`FORK_NOTES.md`](FORK_NOTES.md) for details on what diverges from
+upstream and why.
+
 ## Requirements
 
 - Terraform 0.12+ or OpenTofu 1.x
-- Go 1.23+ (for building from source)
+- Go 1.26+ (for building from source)
 - A DNS Made Easy account with API access (an API key and secret key)
 
 ## Building
 
 ```sh
-git clone https://github.com/DNSMadeEasy/terraform-provider-dme.git
+git clone https://github.com/underarmour/terraform-provider-dme.git
 cd terraform-provider-dme
 make build
 ```
@@ -25,7 +34,7 @@ The binary is installed to `$(go env GOPATH)/bin/terraform-provider-dme`.
 terraform {
   required_providers {
     dme = {
-      source = "DNSMadeEasy/dme"
+      source = "underarmour/dme"
     }
   }
 }
