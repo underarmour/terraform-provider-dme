@@ -5,8 +5,17 @@ example.tf
 terraform.tfplan
 terraform.tfstate
 bin/
+dist/
 modules-dev/
 /pkg/
+
+# Internal planning documents; never publish.
+# Working copies live in the developer's tree but never enter git.
+docs/internal/
+
+# Local credentials (DME_API_KEY, DME_SECRET_KEY, etc.) sourced for
+# acceptance-test runs. Never commit.
+.env
 website/.vagrant
 website/.bundle
 website/build

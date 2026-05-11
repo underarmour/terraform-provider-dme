@@ -1,0 +1,31 @@
+terraform-provider-dme (Under Armour fork)
+===========================================
+
+This product is a fork of `terraform-provider-dme`, originally
+maintained by DNSMadeEasy and licensed under the Mozilla Public
+License, version 2.0.
+
+Upstream project:
+  https://github.com/DNSMadeEasy/terraform-provider-dme
+
+Original work:
+  Copyright (c) DNSMadeEasy and contributors
+  Licensed under the Mozilla Public License, version 2.0
+
+Modifications:
+  Copyright (c) Under Armour, Inc. and contributors
+  Licensed under the Mozilla Public License, version 2.0
+
+This fork was created at upstream commit c46a0e4 (tag v1.0.8,
+2025-06-02). The complete list of modifications and their
+rationale is maintained in FORK_NOTES.md; user-facing release
+notes are in CHANGELOG.md.
+
+You may obtain a copy of the Mozilla Public License, version 2.0
+in the accompanying LICENSE file or at:
+  https://mozilla.org/MPL/2.0/
+
+In accordance with MPL 2.0 Section 3.3, this NOTICE file declares
+modifications made by Under Armour to the Covered Software. Source
+code for both the original work and the modifications is available
+under the same MPL 2.0 terms.
