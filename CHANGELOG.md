@@ -11,23 +11,52 @@ from upstream git history and flagged. Dates are the upstream Release
 
 ## Unreleased
 
+_No changes yet._
+
+## v1.1.0 — 2026-05-11
+
+First release of the Under Armour fork. Drop-in replacement for
+upstream `DNSMadeEasy/dme` v1.0.8: same resource types, same schema,
+identical runtime behavior. The only consumer-side change is updating
+the `source` declaration in `required_providers` from
+`DNSMadeEasy/dme` to `underarmour/dme`.
+
+### Added
+- `NOTICE` file declaring fork modifications per MPL 2.0 §3.3.
+- `FORK_NOTES.md` documenting upstream lineage, toolchain rationale,
+  test-coverage reality, release pipeline, consumer wiring paths,
+  and v2.0.0 preparation reminders.
+- README fork callout linking to FORK_NOTES.md.
+
 ### Changed
+- **Module path renamed** from `github.com/terraform-providers/terraform-provider-dme`
+  to `github.com/underarmour/terraform-provider-dme`. Contributors
+  building from source must use the new import path.
+- **Registry source** is `underarmour/dme` (upstream remains
+  `DNSMadeEasy/dme`).
 - Bumped minimum Go version to **1.26** (`go.mod` `go` directive).
-  Go 1.23 went out of support when Go 1.25 shipped (Aug 2025); pinning to
-  current keeps the project building on supported toolchains and removes
-  ambiguity about which Go features the provider may use.
+  Go 1.23 went out of support when Go 1.25 shipped (Aug 2025);
+  pinning to current keeps the project building on supported
+  toolchains and removes ambiguity about which Go features the
+  provider may use.
 - Release workflow now uses `actions/setup-go@v5` with Go 1.26
   (upgraded from `@v2`, which is GitHub Actions deprecated).
-- Project housekeeping: README rewritten to remove HashiCorp template
-  chrome and modernize build/usage instructions; CHANGELOG reconstructed
-  from upstream tag history (v0.1.0 through v1.0.8).
+- README rewritten to remove HashiCorp template chrome and modernize
+  build/usage instructions; example provider block fixed to match
+  current schema (`api_key`/`secret_key`, modern HCL).
+- CHANGELOG built from upstream GitHub Release bodies for v0.1.0
+  through v1.0.8, with git-history fallback flagged in-line for tags
+  where upstream Release bodies were empty or absent. Keep-a-Changelog
+  section structure throughout.
 
 ### Removed
 - `.travis.yml` (Travis OSS shut down 2021; pinned obsolete tooling).
-- `scripts/gogetcookie.sh` (HashiCorp-internal googlesource cookie hack).
-- `scripts/changelog-links.sh` (hard-coded wrong provider URL; never
-  functional against this repo).
-- `main.tf` (developer scratch file accidentally committed).
+- `scripts/gogetcookie.sh` (HashiCorp-internal googlesource cookie
+  hack; only used by `.travis.yml`).
+- `scripts/changelog-links.sh` (hard-coded wrong provider URL;
+  copy-paste artifact, never functional against this repo).
+- `main.tf` (developer scratch file with hard-coded template IDs
+  accidentally committed).
 
 ## v1.0.8 — 2025-06-26
 
