@@ -9,11 +9,14 @@ and contributors.
 
 ## Status
 
-WIP. The fork has not yet been tagged or published. The first
-intended release is **v1.1.0** — a drop-in replacement for upstream
-v1.0.8 with housekeeping and toolchain modernization but no
-behavior changes. Behavior changes (read-path bug fixes) ship in
-**v2.0.0**.
+v1.1.0 takeover landed on `master` (merge commit `f270453`); the
+fork has not yet been tagged or published. v2.0.0 work is in
+progress on branch `fork/v2.0.0-drift-fixes`. The read-path drift
+fixes for MX value casing, HTTPRED `&` escaping, TXT name casing,
+TXT outer-quote leakage, and long-TXT multi-string junctions
+(DSO-3497 cats 1-5) are committed and unit-tested on that branch.
+Remaining v2.0.0 work — import support for every resource, plus
+the Strong-tier items from the spec — is open.
 
 ## Upstream lineage
 
@@ -71,10 +74,23 @@ Upstream ships 26 test functions across 13 `_test.go` files.
 (they require a live DNS Made Easy account). The repository has
 **zero pure unit tests**.
 
-This means `make test` reports green by skipping everything. The
-fork's read-path bug-fix work will introduce the first pure unit
-tests in this provider, with one failing-then-passing test per
-bug as the standard for accepting a fix.
+This means `make test` reports green by skipping everything for
+the upstream-inherited suite. The cat 1-5 read-path bug-fix work
+introduced the fork's first pure unit tests, following a strict
+failing-then-passing TDD loop per category. Three new test files
+live in `dme/`:
+
+| File                          | Tests | Covers                                                  |
+|-------------------------------|-------|---------------------------------------------------------|
+| `dme/diff_suppress_test.go`   | 4     | DiffSuppressFunc semantics for `name` and `value`,      |
+|                               |       | including ForceNew short-circuit on case-only diffs.    |
+| `dme/read_extract_test.go`    | 7     | `extractField` helper bypassing the `json.Marshal`      |
+|                               |       | HTML-escape path (`&`, `<`, `>`, numbers, bools, nil).  |
+| `dme/value_normalize_test.go` | 4     | TXT/SPF/CAA outer-quote strip and long-TXT internal     |
+|                               |       | `""` multi-string concatenation.                        |
+
+All 17 tests run without `TF_ACC` set; `go test ./dme/` exercises
+them in well under a second.
 
 To exercise the existing acceptance suite against a real DME
 account:
@@ -153,6 +169,35 @@ OpenTofu's filesystem-mirror discovery resolves `source =
 "underarmour/dme"` locally before reaching for the Registry. Same
 `required_providers` declaration on the consumer side; the only
 difference is the CI step that primes the mirror.
+
+## Empirical DME API behavior
+
+Settled by direct-REST PUT-then-GET probes against `api.dnsmadeeasy.com`
+(no Terraform provider in the loop). Evidence captured in an internal
+DNS IaC repository (`work/recon/` probe snapshots).
+
+| Field                              | DME server-side behavior                                                                  |
+|------------------------------------|-------------------------------------------------------------------------------------------|
+| Record `name` (any type)           | Canonicalized to **lowercase** on storage. Mixed case in, lower case back.                |
+| MX/CNAME/NS/ANAME `value` (target) | Canonicalized to **lowercase** on storage.                                                |
+| TXT `value`                        | Wrapped with outer `"…"` on storage. Sent `v=spf1 -all`, GET returns `"v=spf1 -all"`.     |
+| TXT `value` > 255 chars            | Split at 255-byte boundary with internal `""` junction, all wrapped in outer `"…"`. RFC 1035 §3.3.14 multi-string form. |
+| HTTPRED `value`                    | Stored verbatim. `&` round-trips as `&`; literal `\u0026` round-trips as `\u0026`.        |
+
+**Implication for the fork's v2.0.0 fixes:**
+
+- DNS-name case "drift" is not data corruption; it's RFC 1035 §2.3.3
+  case-insensitivity surfacing through canonicalization. The right fix
+  is schema-level `DiffSuppressFunc` using `strings.EqualFold` on the
+  affected attributes — not a read-path patch that "preserves" case the
+  server didn't store.
+- The original `docs/internal/fork-spec.md` framing ("DME stores mixed
+  case") was unsupported by the recon evidence the spec itself cited.
+  Corrected framing: lowercase return is canonicalization, the fix is
+  case-insensitive comparison.
+- Cat 2 (HTTPRED `&` → `\u0026`) and cat 4/5b (TXT outer `"…"` and
+  multi-string junctions) remain unambiguous provider-side read-path
+  bugs and are patched directly.
 
 ## Deferred / follow-on work
 

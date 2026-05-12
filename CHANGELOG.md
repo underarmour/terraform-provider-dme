@@ -11,7 +11,19 @@ from upstream git history and flagged. Dates are the upstream Release
 
 ## Unreleased
 
-_No changes yet._
+### Fixed
+
+- `dme_dns_record` no longer reports spurious drift when the only
+  difference between configuration and state is letter case on
+  `name` or on MX/CNAME/NS/ANAME `value`. DME canonicalizes these
+  to lowercase on storage (RFC 1035 §2.3.3 case-insensitivity);
+  comparison is now case-insensitive via `DiffSuppressFunc`.
+- `dme_dns_record` TXT/SPF/CAA `value` no longer carries the outer
+  `"…"` wrapping or internal `""` multi-string junctions that DME
+  adds on storage. Authoring the value with or without outer quotes
+  is equivalent.
+- `dme_dns_record` HTTPRED `value` no longer has `&` rewritten to
+  `\u0026` on Read.
 
 ## v1.1.0 — 2026-05-11
 
