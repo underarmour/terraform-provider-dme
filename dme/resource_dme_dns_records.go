@@ -26,17 +26,19 @@ func resourceManagedDNSRecordActions() *schema.Resource {
 				Required: true,
 			},
 			"value": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
+				Type:             schema.TypeString,
+				Required:         true,
+				DiffSuppressFunc: suppressCaseInsensitiveDNSValue,
 			},
 			"type": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 			"name": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:             schema.TypeString,
+				Required:         true,
+				ForceNew:         true,
+				DiffSuppressFunc: suppressCaseInsensitiveDNSName,
 			},
 
 			"dynamic_dns": &schema.Schema{
@@ -274,34 +276,25 @@ func resourceManagedDNSRecordActionsRead(d *schema.ResourceData, m interface{}) 
 	d.SetId(fmt.Sprintf("%v", cont1.S("id").String()))
 
 	log.Println("INSIDE READ ID value: ", cont1.S("id").String())
-	d.Set("name", StripQuotes(cont1.S("name").String()))
-	log.Println("Inside read ID name value: ", StripQuotes(cont1.S("name").String()))
-
-	str := StripQuotes(cont1.S("value").String())
-
-	if d.Get("type").(string) == "TXT" || d.Get("type").(string) == "SPF" || d.Get("type").(string) == "CAA" {
-		str = str[2 : len(str)-2]
-	}
-	log.Println("After trim: ", str)
-
-	d.Set("value", str)
-
-	d.Set("type", StripQuotes(cont1.S("type").String()))
-	d.Set("dynamic_dns", StripQuotes(cont1.S("dynamicDns").String()))
-	d.Set("password", StripQuotes(cont1.S("password").String()))
-	d.Set("ttl", StripQuotes(cont1.S("ttl").String()))
-	d.Set("gtd_location", StripQuotes(cont1.S("gtdLocation").String()))
-	d.Set("description", StripQuotes(cont1.S("description").String()))
-	d.Set("keywords", StripQuotes(cont1.S("keywords").String()))
-	d.Set("title", StripQuotes(cont1.S("title").String()))
-	d.Set("redirect_type", StripQuotes(cont1.S("redirectType").String()))
-	d.Set("hardlink", StripQuotes(cont1.S("hardLink").String()))
-	d.Set("mx_level", StripQuotes(cont1.S("mxLevel").String()))
-	d.Set("weight", StripQuotes(cont1.S("weight").String()))
-	d.Set("port", StripQuotes(cont1.S("port").String()))
-	d.Set("priority", StripQuotes(cont1.S("priority").String()))
-	d.Set("caa_type", StripQuotes(cont1.S("caaType").String()))
-	d.Set("issuer_critical", StripQuotes(cont1.S("issuerCritical").String()))
+	recordType := extractField(cont1.S("type"))
+	d.Set("name", extractField(cont1.S("name")))
+	d.Set("value", normalizeValueOnRead(recordType, extractField(cont1.S("value"))))
+	d.Set("type", recordType)
+	d.Set("dynamic_dns", extractField(cont1.S("dynamicDns")))
+	d.Set("password", extractField(cont1.S("password")))
+	d.Set("ttl", extractField(cont1.S("ttl")))
+	d.Set("gtd_location", extractField(cont1.S("gtdLocation")))
+	d.Set("description", extractField(cont1.S("description")))
+	d.Set("keywords", extractField(cont1.S("keywords")))
+	d.Set("title", extractField(cont1.S("title")))
+	d.Set("redirect_type", extractField(cont1.S("redirectType")))
+	d.Set("hardlink", extractField(cont1.S("hardLink")))
+	d.Set("mx_level", extractField(cont1.S("mxLevel")))
+	d.Set("weight", extractField(cont1.S("weight")))
+	d.Set("port", extractField(cont1.S("port")))
+	d.Set("priority", extractField(cont1.S("priority")))
+	d.Set("caa_type", extractField(cont1.S("caaType")))
+	d.Set("issuer_critical", extractField(cont1.S("issuerCritical")))
 
 	return nil
 }
