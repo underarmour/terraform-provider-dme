@@ -53,7 +53,7 @@ func datasourceDMESecondaryIPSetRead(d *schema.ResourceData, m interface{}) erro
 
 	dataCon := con.S("data").Index(cnt)
 	d.SetId(dataCon.S("id").String())
-	d.Set("name", StripQuotes(dataCon.S("name").String()))
+	d.Set("name", extractField(dataCon.S("name")))
 
 	ips := dataCon.S("ips").Data().([]interface{})
 	d.Set("ips", ips)

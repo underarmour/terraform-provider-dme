@@ -95,14 +95,14 @@ func datasourceDMEDomainRead(d *schema.ResourceData, m interface{}) error {
 
 	dataCon := con.S("data").Index(cnt)
 	d.SetId(dataCon.S("id").String())
-	d.Set("name", StripQuotes(dataCon.S("name").String()))
-	d.Set("gtd_enabled", StripQuotes(dataCon.S("gtdEnabled").String()))
-	d.Set("soa_id", StripQuotes(dataCon.S("soaId").String()))
-	d.Set("template_id", StripQuotes(dataCon.S("templateId").String()))
-	d.Set("vanity_id", StripQuotes(dataCon.S("vanityId").String()))
-	d.Set("transfer_acl_id", StripQuotes(dataCon.S("transferAclId").String()))
-	d.Set("folder_id", StripQuotes(dataCon.S("folderId").String()))
-	d.Set("updated", StripQuotes(dataCon.S("updated").String()))
-	d.Set("created", StripQuotes(dataCon.S("created").String()))
+	d.Set("name", extractField(dataCon.S("name")))
+	d.Set("gtd_enabled", extractField(dataCon.S("gtdEnabled")))
+	d.Set("soa_id", extractField(dataCon.S("soaId")))
+	d.Set("template_id", extractField(dataCon.S("templateId")))
+	d.Set("vanity_id", extractField(dataCon.S("vanityId")))
+	d.Set("transfer_acl_id", extractField(dataCon.S("transferAclId")))
+	d.Set("folder_id", extractField(dataCon.S("folderId")))
+	d.Set("updated", extractField(dataCon.S("updated")))
+	d.Set("created", extractField(dataCon.S("created")))
 	return nil
 }

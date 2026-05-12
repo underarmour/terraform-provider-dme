@@ -3,10 +3,10 @@ layout: "dme"
 page_title: "DME: dme_folder_record"
 sidebar_current: "docs-dme-datasource-dme_folder_record"
 description: |-
-    Manages Custom Folder Records for the account.
+    Use this data source to retrieve a folder record from the account.
 ---
 # dme_folder_record #
-Manages Custom Folder Records for the account.
+Use this data source to retrieve a folder record from the account.
 # Example Usage #
 ```hcl
 

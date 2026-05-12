@@ -3,10 +3,10 @@ layout: "dme"
 page_title: "DME: dme_custom_soa_record"
 sidebar_current: "docs-dme-datasource-dme_custom_soa_record"
 description: |-
-    Manages Custom SOA Records for the account.
+    Use this data source to retrieve a custom SOA record from the account.
 ---
 # dme_custom_soa_record #
-Manages Custom SOA Records for the account.
+Use this data source to retrieve a custom SOA record from the account.
 
 # Example Usage #
 ```hcl

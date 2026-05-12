@@ -73,11 +73,11 @@ func datasourceDmeVanityNameserverRead(d *schema.ResourceData, m interface{}) er
 
 	dataCon := con.S("data").Index(cnt)
 	d.SetId(dataCon.S("id").String())
-	d.Set("name", StripQuotes(dataCon.S("name").String()))
-	// d.Set("servers", StripQuotes(dataCon.S("servers").String()))
-	d.Set("public_config", StripQuotes(dataCon.S("public").String()))
-	d.Set("default_config", StripQuotes(dataCon.S("default").String()))
-	d.Set("name_server_group_id", StripQuotes(dataCon.S("nameServerGroupId").String()))
+	d.Set("name", extractField(dataCon.S("name")))
+	// d.Set("servers", extractField(dataCon.S("servers")))
+	d.Set("public_config", extractField(dataCon.S("public")))
+	d.Set("default_config", extractField(dataCon.S("default")))
+	d.Set("name_server_group_id", extractField(dataCon.S("nameServerGroupId")))
 
 	servers := dataCon.S("servers").Data().([]interface{})
 	listServers := make([]string, 0)

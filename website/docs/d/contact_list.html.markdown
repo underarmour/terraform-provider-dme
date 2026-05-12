@@ -3,11 +3,11 @@ layout: "dme"
 page_title: "dme: dme_contact_list"
 sidebar_current: "docs-dme-datasource-dme_contact_list"
 description: |-
-  Data source for Contact List
+  Use this data source to retrieve a contact list from the account.
 ---
 
 # dme_contact_list #
-Data source for Contact List
+Use this data source to retrieve a contact list from the account.
 
 ## Example Usage ##
 

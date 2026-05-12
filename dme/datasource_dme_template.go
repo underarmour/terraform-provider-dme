@@ -61,8 +61,8 @@ func datasourceDMETemplateRead(d *schema.ResourceData, m interface{}) error {
 
 	dataCon := con.S("data").Index(cnt)
 	d.SetId(dataCon.S("id").String())
-	d.Set("name", StripQuotes(dataCon.S("name").String()))
-	d.Set("public_template", StripQuotes(dataCon.S("publicTemplate").String()))
+	d.Set("name", extractField(dataCon.S("name")))
+	d.Set("public_template", extractField(dataCon.S("publicTemplate")))
 
 	ids := dataCon.S("domainIds").Data().([]interface{})
 	listIds := make([]float64, 0)

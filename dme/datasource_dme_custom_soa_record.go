@@ -96,15 +96,15 @@ func datasourceConstellixDomainRead(d *schema.ResourceData, m interface{}) error
 	dataCon := con.S("data").Index(cnt)
 	d.SetId(dataCon.S("id").String())
 
-	d.Set("name", StripQuotes(dataCon.S("name").String()))
-	d.Set("email", StripQuotes(dataCon.S("email").String()))
-	d.Set("comp", StripQuotes(dataCon.S("comp").String()))
-	d.Set("ttl", StripQuotes(dataCon.S("ttl").String()))
-	d.Set("retry", StripQuotes(dataCon.S("retry").String()))
-	d.Set("refresh", StripQuotes(dataCon.S("refresh").String()))
-	d.Set("expire", StripQuotes(dataCon.S("expire").String()))
-	d.Set("serial", StripQuotes(dataCon.S("serial").String()))
-	d.Set("negative_cache", StripQuotes(dataCon.S("negativeCache").String()))
+	d.Set("name", extractField(dataCon.S("name")))
+	d.Set("email", extractField(dataCon.S("email")))
+	d.Set("comp", extractField(dataCon.S("comp")))
+	d.Set("ttl", extractField(dataCon.S("ttl")))
+	d.Set("retry", extractField(dataCon.S("retry")))
+	d.Set("refresh", extractField(dataCon.S("refresh")))
+	d.Set("expire", extractField(dataCon.S("expire")))
+	d.Set("serial", extractField(dataCon.S("serial")))
+	d.Set("negative_cache", extractField(dataCon.S("negativeCache")))
 	return nil
 
 }

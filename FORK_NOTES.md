@@ -9,14 +9,25 @@ and contributors.
 
 ## Status
 
-v1.1.0 takeover landed on `master` (merge commit `f270453`); the
-fork has not yet been tagged or published. v2.0.0 work is in
-progress on branch `fork/v2.0.0-drift-fixes`. The read-path drift
-fixes for MX value casing, HTTPRED `&` escaping, TXT name casing,
-TXT outer-quote leakage, and long-TXT multi-string junctions
-(DSO-3497 cats 1-5) are committed and unit-tested on that branch.
-Remaining v2.0.0 work — import support for every resource, plus
-the Strong-tier items from the spec — is open.
+This fork exists because upstream `DNSMadeEasy/terraform-provider-dme`
+carries read-path bugs that cause spurious plan drift on TXT, HTTPRED,
+and MX records — bugs that are not safe to work around in consumer
+config. Upstream has been active as recently as July 2025, but several
+high-value fixes have not yet been accepted. It also has no import
+support, blocking adoption of `terraform import` for existing DNS
+infrastructure. Fixes here are intended for upstream contribution once
+stabilized.
+
+Changes from upstream v1.0.8:
+- **Read-path drift fixed** for all 12 resources and all 12 data
+  sources: TXT/SPF/CAA outer-quote stripping, long-TXT multi-string
+  junction collapse, HTTPRED `&` HTML-escape correction, MX/CNAME
+  case-insensitive comparison.
+- **Import support** added for all 12 resources via `terraform import`.
+- **43 unit tests** added; upstream shipped zero.
+
+The fork has not yet been tagged or published to a registry. Consumers
+use the filesystem mirror path described in the Consumer wiring section.
 
 ## Upstream lineage
 
@@ -48,6 +59,57 @@ the Strong-tier items from the spec — is open.
   Node-12-based) to `v5` in the release workflow. Required for the
   workflow to reliably consume the new `go.mod` directive.
 
+### Read-path bug fixes (resources and data sources)
+
+Upstream uses `json.Marshal` via `container.String()` to extract field
+values, then strips surrounding quotes with `StripQuotes`. This path
+HTML-escapes `&` → `\u0026`, `<` → `\u003c`, `>` → `\u003e` in any
+field value that contains those characters (HTTPRED URLs being the
+common case), and handles TXT/SPF/CAA values incorrectly.
+
+Fixes applied to all 12 resource Read functions and all 12 data source
+Read functions:
+
+- **HTTPRED `value`**: replaced `StripQuotes(x.String())` with
+  `extractField(x)`, which bypasses `json.Marshal` and returns the raw
+  Go string. `&` in redirect URLs no longer becomes `\u0026`.
+- **TXT/SPF/CAA `value`**: DME wraps values in outer `"…"` on storage
+  and splits values longer than 255 bytes with internal `""` junctions
+  (RFC 1035 §3.3.14 multi-string form). The upstream code assumed a
+  specific pre-2023 encoding that DME no longer produces. Replaced with
+  `normalizeValueOnRead`, which strips the outer quotes and collapses
+  `""` junctions into a single clean string regardless of encoding
+  variant.
+- **MX/CNAME/NS/ANAME `value` and record `name`**: DME canonicalizes
+  these to lowercase on storage. Upstream compared them with `==`,
+  causing spurious drift on any mixed-case input. Fixed with
+  `DiffSuppressFunc` using `strings.EqualFold`.
+
+The root cause of the data source bugs being missed in the initial fix:
+resource and data source Read functions duplicate the same
+field-population logic with no shared helper. A `populateXxxFromContainer`
+refactor is tracked under Known limitations.
+
+### Import support
+
+Upstream never implemented `Importer` on any resource. `terraform import`
+was entirely unsupported; attempting it returned an error.
+
+All 12 resources now have import wired:
+
+- **9 resources** (`dme_domain`, `dme_template`, `dme_contact_list`,
+  `dme_transfer_acl`, `dme_custom_soa_record`,
+  `dme_vanity_nameserver_record`, `dme_secondary_dns`,
+  `dme_secondary_ip_set`, `dme_folder_record`): passthrough import —
+  import ID is the resource's numeric DME ID.
+- **`dme_dns_record`**: composite import ID `domain_id:record_id`.
+  Read refactored to handle post-import state where `name` and `type`
+  are not yet populated; falls back to listing all records in the domain
+  and locating by ID via `findRecordByID`.
+- **`dme_template_record`**: composite import ID `template_id:record_id`.
+- **`dme_failover`**: import ID is the monitored record's DME ID
+  (same as `record_id` in config).
+
 ### Housekeeping (no behavior impact)
 
 - README rewritten to remove HashiCorp template chrome (Gitter,
@@ -75,22 +137,27 @@ Upstream ships 26 test functions across 13 `_test.go` files.
 **zero pure unit tests**.
 
 This means `make test` reports green by skipping everything for
-the upstream-inherited suite. The cat 1-5 read-path bug-fix work
-introduced the fork's first pure unit tests, following a strict
-failing-then-passing TDD loop per category. Three new test files
-live in `dme/`:
+the upstream-inherited suite. The fork's bug-fix work introduced the
+first pure unit tests, following a strict failing-then-passing TDD
+loop. Current unit test inventory (no `TF_ACC` required):
 
-| File                          | Tests | Covers                                                  |
-|-------------------------------|-------|---------------------------------------------------------|
-| `dme/diff_suppress_test.go`   | 4     | DiffSuppressFunc semantics for `name` and `value`,      |
-|                               |       | including ForceNew short-circuit on case-only diffs.    |
-| `dme/read_extract_test.go`    | 7     | `extractField` helper bypassing the `json.Marshal`      |
-|                               |       | HTML-escape path (`&`, `<`, `>`, numbers, bools, nil).  |
-| `dme/value_normalize_test.go` | 4     | TXT/SPF/CAA outer-quote strip and long-TXT internal     |
-|                               |       | `""` multi-string concatenation.                        |
+| File                                    | Tests | Covers                                                        |
+|-----------------------------------------|-------|---------------------------------------------------------------|
+| `dme/diff_suppress_test.go`             | 4     | DiffSuppressFunc semantics for `name` and `value`.            |
+| `dme/read_extract_test.go`              | 7     | `extractField` bypassing the `json.Marshal` HTML-escape path. |
+| `dme/value_normalize_test.go`           | 4     | TXT/SPF/CAA outer-quote strip and long-TXT junction collapse. |
+| `dme/datasource_dme_dns_records_test.go`| 6     | Data source value normalization for TXT, SPF, long-TXT,       |
+|                                         |       | HTTPRED, MX, and A via the same extractField + normalizeValueOnRead path. |
+| `dme/dns_record_lookup_test.go`         | 12    | `findRecordByID` and `recordIDMatches` helpers covering       |
+|                                         |       | float64/int/string ID types and edge cases.                   |
+| `dme/import_dns_record_test.go`         | 4     | `parseDNSRecordImportID` composite ID parsing.                |
+| `dme/import_template_record_test.go`    | 3     | `parseTemplateRecordImportID` composite ID parsing.           |
+| `dme/import_failover_test.go`           | 2     | `importFailoverState` single-ID import.                       |
+| `dme/importer_wiring_test.go`           | 1     | Structural: all 12 resources have `Importer.State` wired.     |
 
-All 17 tests run without `TF_ACC` set; `go test ./dme/` exercises
-them in well under a second.
+Total: 43 unit tests. Additionally, 12 `TestAccImport_*` acceptance
+tests in `dme/import_acceptance_test.go` exercise import end-to-end
+against a live DME account (require `TF_ACC=1`).
 
 To exercise the existing acceptance suite against a real DME
 account:
@@ -199,12 +266,21 @@ DNS IaC repository (`work/recon/` probe snapshots).
   multi-string junctions) remain unambiguous provider-side read-path
   bugs and are patched directly.
 
-## Deferred / follow-on work
+## Known limitations and deferred work
 
-Populated as roadmap items get explicitly deferred during the fork
-work. Each entry records the item, the deferral reason, and the
-release it's expected to land in (or "follow-on, no committed
-target").
+### Populate-helper refactor (aspirational)
+
+Resource Read functions and data source Read functions duplicate the
+same field-population logic. A change to `normalizeValueOnRead` or
+`extractField` must currently be applied in two places, which is how
+the original drift-fix (resources only, not data sources) went
+unnoticed. The right fix is a shared `populateXxxFromContainer`
+function called by both paths, matching the pattern used in the
+Terraform AWS provider's `flattenXxx` helpers. Deferred intentionally:
+a structural refactor of this kind increases the diff against upstream,
+making the fixes harder to evaluate and merge. If upstream accepts the
+bug fixes first, this refactor is more appropriate as a follow-on PR
+against their tree.
 
 ## v2.0.0 preparation reminders
 

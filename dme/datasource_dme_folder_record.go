@@ -93,16 +93,16 @@ func datasourceDmeFolderRead(d *schema.ResourceData, m interface{}) error {
 	}
 
 	dataCon := con.Index(cnt)
-	dataid := StripQuotes(dataCon.S("value").String())
+	dataid := extractField(dataCon.S("value"))
 
 	cont, err := dmeClient.GetbyId("security/folder/" + dataid)
 	if err != nil {
 		return err
 	}
 
-	d.SetId(StripQuotes(cont.S("id").String()))
-	d.Set("name", StripQuotes(cont.S("name").String()))
-	d.Set("default_folder", StripQuotes(cont.S("defaultFolder").String()))
+	d.SetId(extractField(cont.S("id")))
+	d.Set("name", extractField(cont.S("name")))
+	d.Set("default_folder", extractField(cont.S("defaultFolder")))
 
 	count, err := cont.ArrayCount("folderPermissions") //container response
 	if err != nil {
@@ -119,9 +119,9 @@ func datasourceDmeFolderRead(d *schema.ResourceData, m interface{}) error {
 
 		map_permission := make(map[string]interface{})
 
-		map_permission["permission"] = StripQuotes(permiCont.S("permission").String())
-		map_permission["group_id"] = StripQuotes(permiCont.S("groupId").String())
-		map_permission["group_name"] = StripQuotes(permiCont.S("groupName").String())
+		map_permission["permission"] = extractField(permiCont.S("permission"))
+		map_permission["group_id"] = extractField(permiCont.S("groupId"))
+		map_permission["group_name"] = extractField(permiCont.S("groupName"))
 		permilist = append(permilist, map_permission)
 	}
 	d.Set("folder_permissions", permilist)

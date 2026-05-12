@@ -3,11 +3,11 @@ layout: "dme"
 page_title: "dme: dme_failover"
 sidebar_current: "docs-dme-datasource-dme_failover"
 description: |-
-    Manages failover in A record within the account.
+    Use this data source to retrieve failover configuration for a DNS record.
 ---
 
 # dme_failover #
-Manages failover in A record in a domain within the account.
+Use this data source to retrieve failover configuration for a DNS record.
 
 # Example Usage #
 ```hcl

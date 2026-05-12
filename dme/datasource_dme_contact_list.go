@@ -57,7 +57,7 @@ func datasourceDMEContactListRead(d *schema.ResourceData, m interface{}) error {
 	dataCon := con.Index(cnt)
 	log.Println("data from container :", dataCon)
 	d.SetId(dataCon.S("id").String())
-	d.Set("name", StripQuotes(dataCon.S("name").String()))
+	d.Set("name", extractField(dataCon.S("name")))
 	conEmails := dataCon.S("emails").Data().([]interface{})
 	emailList := make([]string, 0)
 	for _, val := range conEmails {
