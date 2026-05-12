@@ -24,6 +24,13 @@ from upstream git history and flagged. Dates are the upstream Release
   is equivalent.
 - `dme_dns_record` HTTPRED `value` no longer has `&` rewritten to
   `\u0026` on Read.
+- `dme_dns_record` and `dme_template_record` **data sources** had the
+  same TXT/SPF/CAA, MX casing, and HTTPRED escaping bugs as their
+  resource counterparts. Both now use `extractField` and
+  `normalizeValueOnRead` for consistent output. All other data sources
+  also switched from the `json.Marshal`-based `StripQuotes` path to
+  `extractField` to prevent HTML-entity leakage on fields containing
+  `&`, `<`, or `>`.
 
 ## v1.1.0 — 2026-05-11
 

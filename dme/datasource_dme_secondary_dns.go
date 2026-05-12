@@ -47,7 +47,7 @@ func datasourceDMESecondaryDNSRead(d *schema.ResourceData, m interface{}) error 
 	var cnt int
 	for _, info := range data {
 		val := info.(map[string]interface{})
-		if StripQuotes(val["name"].(string)) == name {
+		if val["name"].(string) == name {
 			flag = true
 			break
 		}
@@ -59,7 +59,7 @@ func datasourceDMESecondaryDNSRead(d *schema.ResourceData, m interface{}) error 
 
 	dataCon := con.S("data").Index(cnt)
 	d.SetId(dataCon.S("id").String())
-	d.Set("ipset_id", dataCon.S("ipSetId").String())
-	d.Set("folder_id", dataCon.S("folderId").String())
+	d.Set("ipset_id", extractField(dataCon.S("ipSetId")))
+	d.Set("folder_id", extractField(dataCon.S("folderId")))
 	return nil
 }
