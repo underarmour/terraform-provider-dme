@@ -16,6 +16,10 @@ func resourceDMETemplate() *schema.Resource {
 		Update: resourceDMETemplateUpdate,
 		Delete: resourceDMETemplateDelete,
 
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
+
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
 				Type:     schema.TypeString,

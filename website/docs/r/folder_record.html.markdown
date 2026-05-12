@@ -36,3 +36,11 @@ resource "dme_folder_record" "folderrecord" {
 
 ## Attribute Reference ##
 No attributes are exported
+
+## Import ##
+
+DME Folder Record resources can be imported using the numeric ID:
+
+```
+$ tofu import dme_folder_record.example <id>
+```

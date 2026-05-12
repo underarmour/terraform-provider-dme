@@ -24,3 +24,11 @@ resource "dme_template" "first" {
 * `domain_ids` - ids of the domain to which this template is associated.
 * `public_template` - True represents a system defined public template rather than a user defined account specific template.
 * `id` - Set to the dme calculated id of domain action.
+
+## Import ##
+
+DME Template resources can be imported using the numeric ID:
+
+```
+$ tofu import dme_template.example <id>
+```

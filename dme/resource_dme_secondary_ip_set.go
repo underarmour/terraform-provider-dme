@@ -17,6 +17,10 @@ func resourceDMESecondaryIPSet() *schema.Resource {
 		Update: resourceDMESecondaryIPSetUpdate,
 		Delete: resourceDMESecondaryIPSetDelete,
 
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
+
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
 				Type:     schema.TypeString,

@@ -20,6 +20,10 @@ func resourceManagedDNSRecordActions() *schema.Resource {
 		Read:   resourceManagedDNSRecordActionsRead,
 		Delete: resourceManagedDNSRecordActionsDelete,
 
+		Importer: &schema.ResourceImporter{
+			State: importDNSRecordState,
+		},
+
 		Schema: map[string]*schema.Schema{
 			"domain_id": &schema.Schema{
 				Type:     schema.TypeString,

@@ -16,6 +16,10 @@ func resourceDMEFailover() *schema.Resource {
 		Update: resourceDMEFailoverUpdate,
 		Delete: resourceDMEFailoverDelete,
 
+		Importer: &schema.ResourceImporter{
+			State: importFailoverState,
+		},
+
 		Schema: map[string]*schema.Schema{
 			"record_id": &schema.Schema{
 				Type:     schema.TypeString,

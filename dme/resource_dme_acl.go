@@ -19,6 +19,10 @@ func resourceDMEACL() *schema.Resource {
 		Update: resourceDMEACLUpdate,
 		Delete: resourceDMEACLDelete,
 
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
+
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
 				Type:     schema.TypeString,

@@ -29,3 +29,11 @@ resource "dme_vanity_nameserver_record" "vanityrecord" {
 
 ## Attribute Reference ##
 No attributes are exported
+
+## Import ##
+
+DME Vanity Nameserver Record resources can be imported using the numeric ID:
+
+```
+$ tofu import dme_vanity_nameserver_record.example <id>
+```

@@ -25,3 +25,11 @@ resource "dme_secondary_ip_set" "one" {
 
 ## Attribute Reference ##
 * `id` - Set to the dme calculated id of secondary ip set action.
+
+## Import ##
+
+DME Secondary Ip Set resources can be imported using the numeric ID:
+
+```
+$ tofu import dme_secondary_ip_set.example <id>
+```

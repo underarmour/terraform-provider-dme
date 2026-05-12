@@ -23,5 +23,12 @@ resource "dme_transfer_acl" "example" {
 * `ips` - (Required) The list of IP addresses defined in the ACL.
 
 ## Attribute Reference ##
-No attributed is exported for creating this resource. 
+No attributed is exported for creating this resource.
 
+## Import ##
+
+DME Transfer Acl resources can be imported using the numeric ID:
+
+```
+$ tofu import dme_transfer_acl.example <id>
+```

@@ -36,3 +36,11 @@ resource "dme_custom_soa_record" "soacheck" {
 
 ## Attribute Reference ##
 No attributes are exported
+
+## Import ##
+
+DME Custom Soa Record resources can be imported using the numeric ID:
+
+```
+$ tofu import dme_custom_soa_record.example <id>
+```

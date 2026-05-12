@@ -60,3 +60,19 @@ resource "dme_dns_record" "record" {
 
 ## Attribute Reference ##
 The only attribute that this resource exports is the `domain_id`, which is set to the dme calculated id of the resource.
+
+## Import ##
+
+DNS records must be imported using a composite ID combining the domain
+(zone) ID and the record ID, separated by a colon:
+
+```
+$ tofu import dme_dns_record.example <domain_id>:<record_id>
+```
+
+Both IDs are numeric and visible in the DME console URL when viewing the
+zone or record. Example:
+
+```
+$ tofu import dme_dns_record.www 8249868:227177880
+```
