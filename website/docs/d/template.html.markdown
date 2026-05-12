@@ -3,11 +3,11 @@ layout: "dme"
 page_title: "dme: dme_template"
 sidebar_current: "docs-dme-datasource-dme_template"
 description: |-
-  Data source for template action
+  Use this data source to retrieve a template from the account.
 ---
 
 # dme_template #
-Data source for Template action
+Use this data source to retrieve a template from the account.
 
 ## Example Usage ##
 

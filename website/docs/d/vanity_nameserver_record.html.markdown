@@ -3,10 +3,10 @@ layout: "dme"
 page_title: "DME: dme_vanity_nameserver_record"
 sidebar_current: "docs-dme-datasource-dme_vanity_nameserver_record"
 description: |-
-    Manages Custom Vanity Name Server Records for the account.
+    Use this data source to retrieve a vanity nameserver record from the account.
 ---
 # dme_vanity_nameserver_record #
-Manages Custom Vanity Name Server Records for the account.
+Use this data source to retrieve a vanity nameserver record from the account.
 # Example Usage #
 ```hcl
 data "dme_vanity_nameserver_record" "vanityrecord" {

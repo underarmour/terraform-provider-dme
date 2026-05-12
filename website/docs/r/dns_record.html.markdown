@@ -29,18 +29,18 @@ resource "dme_dns_record" "record" {
 ## Argument Reference ##
 * `name` - (Required) Name of record.
 * `value` - (Required) Value of record.
-  For A record Ipv4 address is required. For example: value: "1.2.3.4"
-  For CNAME record alias name is required. For example: value: "www"
-  For ANAME record FQDN is required. For example: value: "www.google.com."
-  For MX record server name is required. For example: value: "document."
-  For HTTPRED record URL is required. For example: value: "http://www.google.com"
-  For TXT record text data is required. For example: value: "practice"
-  For SPF record string value is required. For example: value: "1.2.3.4"
-  For PTR record host name is required. For example: value: "mail.domainDocument."
-  For NS record host name is required. For example: value: "mail.domainDocument." 
-  For AAAA record IPv6 address is required. For example: value: "0::0:0:0:0:0:6"
-  For SRV record host name is required. For example: value: "mail.domainDocument."
-  For CAA record text data is required. For example: value: "comodoca.com"
+  * For A record Ipv4 address is required. For example: value: "1.2.3.4"
+  * For CNAME record alias name is required. For example: value: "www"
+  * For ANAME record FQDN is required. For example: value: "www.google.com."
+  * For MX record server name is required. For example: value: "document."
+  * For HTTPRED record URL is required. For example: value: "http://www.google.com"
+  * For TXT record text data is required. For example: value: "practice"
+  * For SPF record string value is required. For example: value: "1.2.3.4"
+  * For PTR record host name is required. For example: value: "mail.domainDocument."
+  * For NS record host name is required. For example: value: "mail.domainDocument."
+  * For AAAA record IPv6 address is required. For example: value: "0::0:0:0:0:0:6"
+  * For SRV record host name is required. For example: value: "mail.domainDocument."
+  * For CAA record text data is required. For example: value: "comodoca.com"
 * `type` - (Required) The record type. Values: A, AAAA, ANAME, CNAME, HTTPRED, MX, NS, PTR, SRV, TXT, CAA or SPF.
 * `ttl` - (Required) The time to live or TTL of the record.
 * `gtd_location` - (Optional) Global Traffic Director location. Values:DEFAULT, US_EAST, US_WEST, EUROPE, ASIA_PAC, OCREANIA.

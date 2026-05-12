@@ -3,11 +3,11 @@ layout: "dme"
 page_title: "dme: dme_secondary_ip_set"
 sidebar_current: "docs-dme-datasource-dme_secondary_ip_set"
 description: |-
-  Data source for Secondary IP Set action
+  Use this data source to retrieve a secondary IP set from the account.
 ---
 
 # dme_secondary_ip_set #
-Data source for Secondary IP Set action
+Use this data source to retrieve a secondary IP set from the account.
 
 ## Example Usage ##
 

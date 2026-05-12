@@ -3,11 +3,11 @@ layout: "dme"
 page_title: "dme: dme_secondary_dns"
 sidebar_current: "docs-dme-datasource-dme_secondary_dns"
 description: |-
-  Data source for Secondary DNS action
+  Use this data source to retrieve a secondary DNS configuration from the account.
 ---
 
 # dme_secondary_dns #
-Data source for Secondary DNS action
+Use this data source to retrieve a secondary DNS configuration from the account.
 
 ## Example Usage ##
 

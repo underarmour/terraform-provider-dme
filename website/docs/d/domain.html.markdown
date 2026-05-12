@@ -3,11 +3,11 @@ layout: "dme"
 page_title: "dme: dme_domain"
 sidebar_current: "docs-dme-datasource-dme_domain"
 description: |-
-  Data source for domain action
+  Use this data source to retrieve a domain from the account.
 ---
 
 # dme_domain #
-Data source for Domain action
+Use this data source to retrieve a domain from the account.
 
 ## Example Usage ##
 

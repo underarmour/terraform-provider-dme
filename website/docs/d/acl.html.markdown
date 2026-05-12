@@ -3,11 +3,11 @@ layout: "dme"
 page_title: "dme: dme_transfer_acl"
 sidebar_current: "docs-dme-datasource-dme_transfer_acl"
 description: |-
-    Manages ACL (Access Control List) within the account.
+    Use this data source to retrieve a transfer ACL from the account.
 ---
 
 # dme_transfer_acl #
-Manages one or more Access Control Lists within the account.
+Use this data source to retrieve a transfer ACL from the account.
 
 # Example Usage #
 ```hcl
