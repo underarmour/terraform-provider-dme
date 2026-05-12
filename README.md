@@ -5,9 +5,9 @@ Terraform / OpenTofu provider for managing DNS Made Easy resources via the
 
 This is an Under Armour maintained fork of
 [`DNSMadeEasy/terraform-provider-dme`](https://github.com/DNSMadeEasy/terraform-provider-dme).
-It is a drop-in replacement for upstream — same resource types, same
-schema, same behavior — with toolchain modernization and (in v2.x)
-fixes for long-standing read-path drift bugs. Switching forks requires
+It fixes long-standing read-path drift bugs and adds import support
+for all resources, while maintaining the same resource types, schema,
+and API behavior as upstream. Switching forks requires
 exactly one HCL change: `source = "underarmour/dme"`. See
 [`FORK_NOTES.md`](FORK_NOTES.md) for details on what diverges from
 upstream and why.

@@ -321,6 +321,17 @@ against their tree.
   path. The workaround is a `terraform apply` followed by a second
   `terraform apply`. Diagnosed upstream in 2020; still reproduces
   against current provider versions.
+- **Dynamic DNS records drift on every plan.** When `dynamic_dns =
+  true`, the IP value is updated outside Terraform by the DME dynamic
+  DNS client. Every Read reflects the current live IP into state, so
+  the next plan sees drift against the static value in config and
+  proposes an overwrite. The safe workaround today is
+  `lifecycle { ignore_changes = [value] }` in the resource block. An
+  upstream PR (#38) proposed an `init_value` field as an alternative,
+  but it introduces a breaking schema change and sidesteps rather than
+  fixes the underlying behavior. The right long-term fix is to make
+  `value` behave as `Computed`-only when `dynamic_dns = true`, which
+  requires a schema decision upstream before adoption here.
 
 ## Pre-release checklist
 
