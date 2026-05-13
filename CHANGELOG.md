@@ -25,6 +25,30 @@ from upstream git history and flagged. Dates are the upstream Release
     monitor attached)
   - All others: the resource's numeric ID as shown in the DME console.
 
+## v1.1.1 — 2026-05-12
+
+### Upgrade notes
+
+The fixes below correct what the provider reads back from the DME API.
+If your configuration was written correctly (TXT values without outer
+quotes, HTTPRED URLs with literal `&`), plans will simply go clean
+after upgrading — no config changes needed.
+
+If you worked around these bugs in config, you will see inverse drift
+on first plan after upgrading:
+
+- **TXT/SPF/CAA workaround:** if `value` was written as
+  `"\"v=spf1 -all\""` (with escaped outer quotes) to match what the
+  provider was reading back, remove the outer quotes. The correct
+  form is `"v=spf1 -all"`.
+- **HTTPRED workaround:** if `value` was written with `\u0026` instead
+  of `&` to match what the provider was reading back, replace it with
+  a literal `&`.
+
+In both cases, run `terraform plan` after upgrading to identify
+affected resources, update config to the correct form, and the plan
+will go clean.
+
 ### Fixed
 
 - `dme_dns_record` no longer reports spurious drift when the only
@@ -33,7 +57,7 @@ from upstream git history and flagged. Dates are the upstream Release
   to lowercase on storage (RFC 1035 §2.3.3 case-insensitivity);
   comparison is now case-insensitive via `DiffSuppressFunc`.
 - `dme_dns_record` TXT/SPF/CAA `value` no longer carries the outer
-  `"…"` wrapping or internal `""` multi-string junctions that DME
+  `"..."` wrapping or internal `""` multi-string junctions that DME
   adds on storage. Authoring the value with or without outer quotes
   is equivalent.
 - `dme_dns_record` HTTPRED `value` no longer has `&` rewritten to
