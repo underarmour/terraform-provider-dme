@@ -171,7 +171,7 @@ func TestAccImport_DNSRecord(t *testing.T) {
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
-			{Config: testAccCheckDMERecordConfig_basic("86400")},
+			{Config: testAccCheckDMERecordConfig("86400", "tf-acc-import-dns.com")},
 			{
 				ResourceName:      "dme_dns_record.a1",
 				ImportState:       true,

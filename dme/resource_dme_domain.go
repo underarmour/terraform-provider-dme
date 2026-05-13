@@ -193,7 +193,7 @@ func resourceDMEDomainDelete(d *schema.ResourceData, m interface{}) error {
 	// The sandbox marks domains as "pending" briefly after creation or a prior
 	// delete. Retry with backoff until the domain leaves pending state.
 	var err error
-	for i := 0; i < 24; i++ {
+	for i := 0; i < 36; i++ {
 		err = dmeClient.Delete("dns/managed/" + dn)
 		if err == nil {
 			break
@@ -201,7 +201,7 @@ func resourceDMEDomainDelete(d *schema.ResourceData, m interface{}) error {
 		if !strings.Contains(err.Error(), "pending") {
 			break
 		}
-		log.Printf("[DEBUG] domain %s pending, retrying delete in 5s (attempt %d/24)", dn, i+1)
+		log.Printf("[DEBUG] domain %s pending, retrying delete in 5s (attempt %d/36)", dn, i+1)
 		time.Sleep(5 * time.Second)
 	}
 	if err != nil {

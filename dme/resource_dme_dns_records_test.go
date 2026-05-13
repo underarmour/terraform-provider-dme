@@ -56,9 +56,13 @@ func TestAccDMERecord_Update(t *testing.T) {
 }
 
 func testAccCheckDMERecordConfig_basic(ttl string) string {
+	return testAccCheckDMERecordConfig(ttl, "tf-acc-dns-crud.com")
+}
+
+func testAccCheckDMERecordConfig(ttl, domain string) string {
 	return fmt.Sprintf(`
 	resource "dme_domain" "domain1" {
-		name = "tf-acc-dns-rec.com"
+		name = "%s"
 	}
 
 	resource "dme_dns_record" "a1"{
@@ -68,7 +72,7 @@ func testAccCheckDMERecordConfig_basic(ttl string) string {
 		type = "A"
 		value = "1.2.3.4"
 	}
-	`, ttl)
+	`, domain, ttl)
 }
 
 func testAccCheckDMERecordExists(domainName string, name string, model *models.ManagedDNSRecordActions) resource.TestCheckFunc {
