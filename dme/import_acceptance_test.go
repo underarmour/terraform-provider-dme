@@ -115,6 +115,7 @@ func TestAccImport_VanityNameserver(t *testing.T) {
 }
 
 func TestAccImport_SecondaryDNS(t *testing.T) {
+	testAccSkipIfSandbox(t)
 	resource.Test(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
@@ -130,6 +131,7 @@ func TestAccImport_SecondaryDNS(t *testing.T) {
 }
 
 func TestAccImport_SecondaryIPSet(t *testing.T) {
+	testAccSkipIfSandbox(t)
 	resource.Test(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
@@ -145,6 +147,7 @@ func TestAccImport_SecondaryIPSet(t *testing.T) {
 }
 
 func TestAccImport_FolderRecord(t *testing.T) {
+	testAccSkipIfSandbox(t)
 	resource.Test(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
@@ -222,6 +225,7 @@ func TestAccImport_TemplateRecord(t *testing.T) {
 }
 
 func TestAccImport_Failover(t *testing.T) {
+	testAccSkipIfSandbox(t)
 	resource.Test(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,

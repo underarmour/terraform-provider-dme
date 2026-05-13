@@ -104,10 +104,30 @@ func resourceDmeVanityNameserverRead(d *schema.ResourceData, m interface{}) erro
 	}
 
 	d.Set("name", StripQuotes(con.S("name").String()))
-	d.Set("servers", StripQuotes(con.S("servers").String()))
-	d.Set("public_config", StripQuotes(con.S("public").String()))
-	d.Set("default_config", StripQuotes(con.S("default").String()))
-	d.Set("name_server_group_id", StripQuotes(con.S("nameServerGroupId").String()))
+
+	if raw := con.S("servers").Data(); raw != nil {
+		if slice, ok := raw.([]interface{}); ok {
+			servers := make([]string, len(slice))
+			for i, s := range slice {
+				servers[i] = s.(string)
+			}
+			d.Set("servers", servers)
+		}
+	}
+
+	if b, ok := con.S("public").Data().(bool); ok {
+		d.Set("public_config", b)
+	} else {
+		d.Set("public_config", StripQuotes(con.S("public").String()) == "true")
+	}
+
+	if b, ok := con.S("default").Data().(bool); ok {
+		d.Set("default_config", b)
+	} else {
+		d.Set("default_config", StripQuotes(con.S("default").String()) == "true")
+	}
+
+	setIntField(d, "name_server_group_id", StripQuotes(con.S("nameServerGroupId").String()))
 
 	return nil
 }

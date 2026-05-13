@@ -12,6 +12,7 @@ import (
 )
 
 func TestAccSecondaryDNS_Basic(t *testing.T) {
+	testAccSkipIfSandbox(t)
 	var secondDNS models.SecondaryDNS
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -30,6 +31,7 @@ func TestAccSecondaryDNS_Basic(t *testing.T) {
 }
 
 func TestAccDMESecondaryDNS_Update(t *testing.T) {
+	testAccSkipIfSandbox(t)
 	var secondDNS models.SecondaryDNS
 
 	resource.Test(t, resource.TestCase{
