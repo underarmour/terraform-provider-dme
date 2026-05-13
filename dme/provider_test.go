@@ -29,13 +29,11 @@ func TestProvider_impl(t *testing.T) {
 }
 
 func testAccPreCheck(t *testing.T) {
-	// We will use this function later on to make sure our test environment is valid.
-	// For example, you can make sure here that some environment variables are set.
-	if v := os.Getenv("apikey"); v == "" {
-		t.Fatal("API KEY env variable must be set for acceptance tests")
+	if v := os.Getenv("DME_API_KEY"); v == "" {
+		t.Fatal("DME_API_KEY must be set for acceptance tests")
 	}
 
-	if v := os.Getenv("secretkey"); v == "" {
-		t.Fatal("SECRET KEY env variable must be set for acceptance tests")
+	if v := os.Getenv("DME_SECRET_KEY"); v == "" {
+		t.Fatal("DME_SECRET_KEY must be set for acceptance tests")
 	}
 }

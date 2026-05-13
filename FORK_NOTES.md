@@ -199,7 +199,10 @@ TF_ACC=1 \
 To run against a real production DME account:
 
 ```sh
-TF_ACC=1 DME_API_KEY=... DME_SECRET_KEY=... make testacc
+TF_ACC=1 \
+  DME_API_KEY=<prod-key> \
+  DME_SECRET_KEY=<prod-secret> \
+  make testacc
 ```
 
 ## Build

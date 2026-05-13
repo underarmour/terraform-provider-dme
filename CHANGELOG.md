@@ -11,6 +11,12 @@ from upstream git history and flagged. Dates are the upstream Release
 
 ## Unreleased
 
+### Changed
+
+- Acceptance test credentials now use `DME_API_KEY` and `DME_SECRET_KEY`
+  (consistent with the provider's own env var convention) instead of the
+  upstream `apikey` and `secretkey` env var names.
+
 ### Added
 
 - All optional provider configuration fields (`insecure`, `proxy_url`,
