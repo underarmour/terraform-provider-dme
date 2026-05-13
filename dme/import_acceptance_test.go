@@ -23,6 +23,7 @@ import (
 // ---------------------------------------------------------------------------
 
 func TestAccImport_Domain(t *testing.T) {
+	testAccSkipIfSandbox(t)
 	resource.Test(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
