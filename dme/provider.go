@@ -29,6 +29,7 @@ func Provider() terraform.ResourceProvider {
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Description: "Allows insecure HTTTPS client",
+				DefaultFunc: schema.EnvDefaultFunc("DME_INSECURE", false),
 			},
 
 			"proxyurl": &schema.Schema{
@@ -42,12 +43,14 @@ func Provider() terraform.ResourceProvider {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Proxy server URL",
+				DefaultFunc: schema.EnvDefaultFunc("DME_PROXY_URL", ""),
 			},
 
 			"base_url": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "API base URL",
+				DefaultFunc: schema.EnvDefaultFunc("DME_BASE_URL", ""),
 			},
 		},
 

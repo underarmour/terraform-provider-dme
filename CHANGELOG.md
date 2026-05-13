@@ -13,6 +13,11 @@ from upstream git history and flagged. Dates are the upstream Release
 
 ### Added
 
+- All optional provider configuration fields (`insecure`, `proxy_url`,
+  `base_url`) can now be set via environment variables (`DME_INSECURE`,
+  `DME_PROXY_URL`, `DME_BASE_URL`). The required fields (`api_key`,
+  `secret_key`) already supported `DME_API_KEY` and `DME_SECRET_KEY`;
+  this brings the optional fields in line with the same convention.
 - Import support (`tofu import` / `terraform import`) for all twelve
   resources: `dme_domain`, `dme_dns_record`, `dme_template`,
   `dme_template_record`, `dme_contact_list`, `dme_transfer_acl`,
