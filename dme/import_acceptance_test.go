@@ -28,7 +28,7 @@ func TestAccImport_Domain(t *testing.T) {
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckDMEDomainConfig_basic("import-test-domain.com", "false"),
+				Config: testAccCheckDMEDomainConfig_basic("tf-acc-import-domain.com", "false"),
 			},
 			{
 				ResourceName:      "dme_domain.example",

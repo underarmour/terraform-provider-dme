@@ -58,7 +58,7 @@ func TestAccDMERecord_Update(t *testing.T) {
 func testAccCheckDMERecordConfig_basic(ttl string) string {
 	return fmt.Sprintf(`
 	resource "dme_domain" "domain1" {
-		name = "tf-acc-dnsrecord-test.com"
+		name = "tf-acc-dns-rec.com"
 	}
 
 	resource "dme_dns_record" "a1"{

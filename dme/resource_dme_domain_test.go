@@ -19,10 +19,10 @@ func TestAccDomain_Basic(t *testing.T) {
 		CheckDestroy: testAccCheckDMEDomainDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckDMEDomainConfig_basic("domain_test_basic1.com", "false"),
+				Config: testAccCheckDMEDomainConfig_basic("tf-acc-dom-basic.com", "false"),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckDMEDomainExists("dme_domain.example", &domain),
-					testAccCheckDMEDomainAttributes("domain_test_basic1.com", "false", &domain),
+					testAccCheckDMEDomainAttributes("tf-acc-dom-basic.com", "false", &domain),
 				),
 			},
 		},
@@ -38,17 +38,17 @@ func TestAccDMEDomain_Update(t *testing.T) {
 		CheckDestroy: testAccCheckDMEDomainDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckDMEDomainConfig_basic("domain_test_update1.com", "false"),
+				Config: testAccCheckDMEDomainConfig_basic("tf-acc-dom-update.com", "false"),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckDMEDomainExists("dme_domain.example", &domain),
-					testAccCheckDMEDomainAttributes("domain_test_update1.com", "false", &domain),
+					testAccCheckDMEDomainAttributes("tf-acc-dom-update.com", "false", &domain),
 				),
 			},
 			{
-				Config: testAccCheckDMEDomainConfig_basic("domain_test_update1.com", "true"),
+				Config: testAccCheckDMEDomainConfig_basic("tf-acc-dom-update.com", "true"),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckDMEDomainExists("dme_domain.example", &domain),
-					testAccCheckDMEDomainAttributes("domain_test_update1.com", "true", &domain),
+					testAccCheckDMEDomainAttributes("tf-acc-dom-update.com", "true", &domain),
 				),
 			},
 		},
