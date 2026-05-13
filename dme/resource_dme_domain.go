@@ -17,6 +17,10 @@ func resourceDMEDomain() *schema.Resource {
 		Update: resourceDMEDomainUpdate,
 		Delete: resourceDMEDomainDelete,
 
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
+
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
 				Type:     schema.TypeString,

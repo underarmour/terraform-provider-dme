@@ -11,6 +11,20 @@ from upstream git history and flagged. Dates are the upstream Release
 
 ## Unreleased
 
+### Added
+
+- Import support (`tofu import` / `terraform import`) for all twelve
+  resources: `dme_domain`, `dme_dns_record`, `dme_template`,
+  `dme_template_record`, `dme_contact_list`, `dme_transfer_acl`,
+  `dme_custom_soa_record`, `dme_vanity_nameserver_record`,
+  `dme_secondary_dns`, `dme_secondary_ip_set`, `dme_failover`,
+  `dme_folder_record`. Import ID formats:
+  - `dme_dns_record`: `<domain_id>:<record_id>`
+  - `dme_template_record`: `<template_id>:<record_id>`
+  - `dme_failover`: `<record_id>` (the DNS record ID with a failover
+    monitor attached)
+  - All others: the resource's numeric ID as shown in the DME console.
+
 ### Fixed
 
 - `dme_dns_record` no longer reports spurious drift when the only
@@ -44,7 +58,7 @@ the `source` declaration in `required_providers` from
 - `NOTICE` file declaring fork modifications per MPL 2.0 §3.3.
 - `FORK_NOTES.md` documenting upstream lineage, toolchain rationale,
   test-coverage reality, release pipeline, consumer wiring paths,
-  and v2.0.0 preparation reminders.
+  and a pre-release checklist.
 - README fork callout linking to FORK_NOTES.md.
 
 ### Changed

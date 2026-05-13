@@ -41,3 +41,11 @@ was last updated in Epoch time. Not configurable by the user.
 * `created` - The number of seconds since the domain
 was last created in Epoch time. Not configurable by the user.
 * `id` - Set to the dme calculated id of domain action.
+
+## Import ##
+
+DME Domain resources can be imported using the numeric ID:
+
+```
+$ tofu import dme_domain.example <id>
+```

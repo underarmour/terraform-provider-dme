@@ -20,6 +20,10 @@ func resourceManagedDNSRecordActions() *schema.Resource {
 		Read:   resourceManagedDNSRecordActionsRead,
 		Delete: resourceManagedDNSRecordActionsDelete,
 
+		Importer: &schema.ResourceImporter{
+			State: importDNSRecordState,
+		},
+
 		Schema: map[string]*schema.Schema{
 			"domain_id": &schema.Schema{
 				Type:     schema.TypeString,
@@ -248,35 +252,33 @@ func resourceManagedDNSRecordActionsCreate(d *schema.ResourceData, m interface{}
 
 func resourceManagedDNSRecordActionsRead(d *schema.ResourceData, m interface{}) error {
 	dmeClient := m.(*client.Client)
-	log.Println("andkamdak")
 	dnsId := d.Id()
-	log.Println("Inside read ID value: ", dnsId)
-	con, err := dmeClient.GetbyId("dns/managed/" + d.Get("domain_id").(string) + "/records?recordName=" + d.Get("name").(string) + "&type=" + d.Get("type").(string))
+	domainID := d.Get("domain_id").(string)
+	name := d.Get("name").(string)
+	recordType := d.Get("type").(string)
+
+	// When name and type are empty the resource was just imported and the
+	// Importer only had the composite ID to work with. Fall back to listing
+	// all records in the domain and locating by numeric ID.
+	endpoint := "dns/managed/" + domainID + "/records"
+	if name != "" && recordType != "" {
+		endpoint += "?recordName=" + name + "&type=" + recordType
+	}
+
+	con, err := dmeClient.GetbyId(endpoint)
 	if err != nil {
 		return err
 	}
-	log.Println("Inside read method: ", con)
 
-	data := con.S("data").Data().([]interface{})
-	var count int
-	log.Println("data: ", data)
-
-	for _, info := range data {
-		val := info.(map[string]interface{})
-		s := fmt.Sprintf("%.f", val["id"])
-		log.Println("s value: ", s)
-		if s == dnsId {
-			break
-		}
-		count = count + 1
+	cont1 := findRecordByID(con, dnsId)
+	if cont1 == nil {
+		log.Printf("[WARN] DME record %s not found in domain %s; removing from state", dnsId, domainID)
+		d.SetId("")
+		return nil
 	}
 
-	cont1 := con.S("data").Index(count)
-
 	d.SetId(fmt.Sprintf("%v", cont1.S("id").String()))
-
-	log.Println("INSIDE READ ID value: ", cont1.S("id").String())
-	recordType := extractField(cont1.S("type"))
+	recordType = extractField(cont1.S("type"))
 	d.Set("name", extractField(cont1.S("name")))
 	d.Set("value", normalizeValueOnRead(recordType, extractField(cont1.S("value"))))
 	d.Set("type", recordType)

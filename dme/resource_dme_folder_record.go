@@ -17,6 +17,10 @@ func resourceDmeFolder() *schema.Resource {
 		Update: resourceDmeFolderUpdate,
 		Delete: resourceDmeFolderDelete,
 
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
+
 		SchemaVersion: 1,
 
 		Schema: map[string]*schema.Schema{

@@ -48,12 +48,18 @@ resource "dme_failover" "record" {
 ## Attribute Reference ##
 The only attribute that this resource exports is the `record_id`, which is set to the dme calculated id of the failover resource.
 
+## Import ##
 
+Failover monitors are imported using the ID of the DNS record that has
+the monitor attached (the `record_id` attribute), not a separate monitor
+ID:
 
+```
+$ tofu import dme_failover.example <record_id>
+```
 
+Example:
 
-
-
-
-
-
+```
+$ tofu import dme_failover.www 227177880
+```

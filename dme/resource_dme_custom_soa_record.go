@@ -16,6 +16,10 @@ func resourceDmeCustomSoaRecord() *schema.Resource {
 		Update: resourceDmeSOAUpdate,
 		Delete: resourceDmeSOADelete,
 
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
+
 		SchemaVersion: 1,
 
 		Schema: map[string]*schema.Schema{

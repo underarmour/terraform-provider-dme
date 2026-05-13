@@ -29,3 +29,11 @@ It takes around 10 minutes to reflect the changes on the DNS Made Easy platform.
 
 ## Attribute Reference ##
 * `id` - Set to the dme calculated id of secondary DNS action.
+
+## Import ##
+
+DME Secondary Dns resources can be imported using the numeric ID:
+
+```
+$ tofu import dme_secondary_dns.example <id>
+```

@@ -55,3 +55,18 @@ resource "dme_template_record" "record" {
 
 ## Attribute Reference ##
 The only attribute that this resource exports is the `template_id`, which is set to the dme calculated id of the resource.
+
+## Import ##
+
+Template records must be imported using a composite ID combining the
+template ID and the record ID, separated by a colon:
+
+```
+$ tofu import dme_template_record.example <template_id>:<record_id>
+```
+
+Example:
+
+```
+$ tofu import dme_template_record.mx 12345:67890
+```

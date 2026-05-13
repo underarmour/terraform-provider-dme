@@ -251,7 +251,7 @@ DNS IaC repository (`work/recon/` probe snapshots).
 | TXT `value` > 255 chars            | Split at 255-byte boundary with internal `""` junction, all wrapped in outer `"…"`. RFC 1035 §3.3.14 multi-string form. |
 | HTTPRED `value`                    | Stored verbatim. `&` round-trips as `&`; literal `\u0026` round-trips as `\u0026`.        |
 
-**Implication for the fork's v2.0.0 fixes:**
+**Implication for the fork's read-path fixes:**
 
 - DNS-name case "drift" is not data corruption; it's RFC 1035 §2.3.3
   case-insensitivity surfacing through canonicalization. The right fix
@@ -268,6 +268,10 @@ DNS IaC repository (`work/recon/` probe snapshots).
 
 ## Known limitations and deferred work
 
+Diagnosed gaps in the current provider. Each entry describes the
+user-visible problem and the shape of a solution, so the list is
+useful to contributors and surfaces the remaining work to upstream.
+
 ### Populate-helper refactor (aspirational)
 
 Resource Read functions and data source Read functions duplicate the
@@ -282,22 +286,68 @@ making the fixes harder to evaluate and merge. If upstream accepts the
 bug fixes first, this refactor is more appropriate as a follow-on PR
 against their tree.
 
-## v2.0.0 preparation reminders
+- **Rate limiting — no retry/backoff.** DME enforces a 150-request
+  / 5-minute sliding window. The provider has no retry or backoff
+  logic; rate-limit exhaustion causes plan failures on large applies.
+  The standard workaround is `-parallelism=1`. The correct fix is to
+  detect the `Retry-After` response header and apply exponential
+  backoff with jitter before retrying.
 
-Items to revisit when prepping the v2.0.0 release (post-bug-fix work).
-Captured here so they don't slip through the cracks at release time.
+- **Domain-info re-fetched on every record operation.** Each record
+  create/update/delete re-fetches the full domain list to resolve the
+  domain ID, burning rate-limit budget unnecessarily. An upstream PR
+  exists that caches domain-info lookups across record operations
+  within a single apply. Adopting it is the prerequisite for safely
+  raising parallelism.
+
+- **No bulk operations.** DME's REST API supports multi-record
+  create, update, and delete in a single call. The provider issues
+  one API call per record. On large zones this is both slow and
+  rate-limit-expensive. Bulk-operation support would be a significant
+  quality-of-life improvement for consumers with high record counts.
+
+- **Concurrency safety untested.** The `-parallelism=1` workaround
+  masks potential races in the provider's internal state and in the
+  DME client wrapper. Raising parallelism safely requires a
+  concurrency audit alongside the caching and bulk-operation work;
+  doing either without the audit risks subtle corruption under
+  concurrent applies.
+
+- **Multi-value record creation fails on first apply (upstream issue
+  #26).** Creating sibling records with the same name in a single
+  apply — multiple A records for the same hostname, multiple MX
+  targets, NS delegations — partially fails due to a stale list-
+  records cache or eventual-consistency race in the Create-then-Read
+  path. The workaround is a `terraform apply` followed by a second
+  `terraform apply`. Diagnosed upstream in 2020; still reproduces
+  against current provider versions.
+- **Dynamic DNS records drift on every plan.** When `dynamic_dns =
+  true`, the IP value is updated outside Terraform by the DME dynamic
+  DNS client. Every Read reflects the current live IP into state, so
+  the next plan sees drift against the static value in config and
+  proposes an overwrite. The safe workaround today is
+  `lifecycle { ignore_changes = [value] }` in the resource block. An
+  upstream PR (#38) proposed an `init_value` field as an alternative,
+  but it introduces a breaking schema change and sidesteps rather than
+  fixes the underlying behavior. The right long-term fix is to make
+  `value` behave as `Computed`-only when `dynamic_dns = true`, which
+  requires a schema decision upstream before adoption here.
+
+## Pre-release checklist
+
+Items to revisit when cutting the next release. Captured here so
+nothing slips through the cracks at tag time.
 
 - **README "drop-in replacement" language.** The fork callout at the
   top of `README.md` asserts drop-in compatibility with upstream.
-  That claim is correct for v1.1.0 but breaks the moment v2.0.0
-  ships read-path behavior changes. At v2.0.0 cut, rewrite the
-  callout to describe v2.x as a corrected-behavior replacement (not
-  drop-in) with a pointer to v1.1.x for consumers who want the
-  unchanged-behavior line.
-- **CHANGELOG breaking-change section.** v2.0.0 needs a clear
-  `### Breaking changes` subsection listing every read-path
-  semantic that shifted, plus any schema-shape changes from
-  adding import support.
+  That claim holds only while behavior is unchanged. If the release
+  ships behavior changes (read-path fixes, etc.), rewrite the callout
+  to describe the fork as a corrected-behavior replacement and note
+  which version line is unchanged for consumers who want it.
+- **CHANGELOG breaking-change section.** If any released change is
+  breaking by semver, add a `### Breaking changes` subsection listing
+  every affected behavior. Determine the version bump (minor vs major)
+  from the actual set of changes, not from a pre-set target.
 - **State upgrader.** If any read-path fix shifts the on-disk state
   shape (most likely for long-TXT records, where the multi-string
   wire encoding may normalize differently in state), schema version

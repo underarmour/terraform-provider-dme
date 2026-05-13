@@ -22,6 +22,10 @@ func resourceDMETemplateRecord() *schema.Resource {
 		Read:   resourceDMETemplateRecordRead,
 		Delete: resourceDMETemplateRecordDelete,
 
+		Importer: &schema.ResourceImporter{
+			State: importTemplateRecordState,
+		},
+
 		Schema: map[string]*schema.Schema{
 			"template_id": &schema.Schema{
 				Type:     schema.TypeString,

@@ -23,3 +23,11 @@ resource "dme_contact_list" "first" {
 
 ## Attribute Reference ##
 * `id` - Set to the dme calculated id of contact list.
+
+## Import ##
+
+DME Contact List resources can be imported using the numeric ID:
+
+```
+$ tofu import dme_contact_list.example <id>
+```
