@@ -167,6 +167,7 @@ func TestAccImport_FolderRecord(t *testing.T) {
 // ---------------------------------------------------------------------------
 
 func TestAccImport_DNSRecord(t *testing.T) {
+	testAccSkipIfSandbox(t)
 	resource.Test(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,

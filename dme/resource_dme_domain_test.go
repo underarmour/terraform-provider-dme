@@ -12,6 +12,7 @@ import (
 )
 
 func TestAccDomain_Basic(t *testing.T) {
+	testAccSkipIfSandbox(t)
 	var domain models.DomainAttribute
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -30,6 +31,7 @@ func TestAccDomain_Basic(t *testing.T) {
 }
 
 func TestAccDMEDomain_Update(t *testing.T) {
+	testAccSkipIfSandbox(t)
 	var domain models.DomainAttribute
 
 	resource.Test(t, resource.TestCase{

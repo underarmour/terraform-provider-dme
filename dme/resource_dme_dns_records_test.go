@@ -12,6 +12,7 @@ import (
 )
 
 func TestAccDomainRecords_Basic(t *testing.T) {
+	testAccSkipIfSandbox(t)
 	var record models.ManagedDNSRecordActions
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -30,6 +31,7 @@ func TestAccDomainRecords_Basic(t *testing.T) {
 }
 
 func TestAccDMERecord_Update(t *testing.T) {
+	testAccSkipIfSandbox(t)
 	var a models.ManagedDNSRecordActions
 
 	resource.Test(t, resource.TestCase{
