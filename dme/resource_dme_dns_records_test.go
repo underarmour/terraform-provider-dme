@@ -50,7 +50,7 @@ func TestAccDMERecord_Update(t *testing.T) {
 				Config: testAccCheckDMERecordConfig("86400", dom),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckDMERecordExists("dme_domain.domain1", "dme_dns_record.a1", &a),
-					testAccCheckDMERecordAttributes("86500", &a),
+					testAccCheckDMERecordAttributes("86400", &a),
 				),
 			},
 			{
