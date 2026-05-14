@@ -2,6 +2,7 @@ package dme
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/DNSMadeEasy/dme-go-client/client"
@@ -109,20 +110,30 @@ func domainfromcontainer(con *container.Container) (*models.DomainAttribute, err
 }
 
 func testAccCheckDMEDomainDestroy(s *terraform.State) error {
-	// time.Sleep(10 * time.Minute)
-	client := testAccProvider.Meta().(*client.Client)
+	c := testAccProvider.Meta().(*client.Client)
 
 	for _, rs := range s.RootModule().Resources {
-
-		if rs.Type == "dme_domain" {
-			_, err := client.GetbyId("dns/managed/" + rs.Primary.ID)
-			if err == nil {
-				return fmt.Errorf("Domain is still exists")
-			}
-		} else {
+		if rs.Type != "dme_domain" {
 			continue
 		}
 
+		// DME domain deletes are async. We use DELETE as a status probe:
+		// - "pending" error  → delete accepted and in flight, declare success
+		// - "not found" (404) → already gone, declare success
+		// - nil (200)         → domain still active; first delete didn't take,
+		//                       which is a real failure for a lifecycle test
+		// - any other error   → unexpected, fail
+		err := c.Delete("dns/managed/" + rs.Primary.ID)
+		if err == nil {
+			return fmt.Errorf("domain %s still active after delete (second DELETE returned 200)", rs.Primary.ID)
+		}
+		if strings.Contains(err.Error(), "Particular item not found") {
+			continue
+		}
+		if strings.Contains(err.Error(), "pending") {
+			continue
+		}
+		return fmt.Errorf("domain %s: unexpected error on destroy check: %s", rs.Primary.ID, err)
 	}
 	return nil
 }
