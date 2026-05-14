@@ -9,21 +9,10 @@ body was empty, a placeholder, or absent, the entry is reconstructed
 from upstream git history and flagged. Dates are the upstream Release
 `published_at` value where available, otherwise the tag commit date.
 
-## Unreleased
-
-### Changed
-
-- Acceptance test credentials now use `DME_API_KEY` and `DME_SECRET_KEY`
-  (consistent with the provider's own env var convention) instead of the
-  upstream `apikey` and `secretkey` env var names.
+## v1.2.0 — 2026-05-14
 
 ### Added
 
-- All optional provider configuration fields (`insecure`, `proxy_url`,
-  `base_url`) can now be set via environment variables (`DME_INSECURE`,
-  `DME_PROXY_URL`, `DME_BASE_URL`). The required fields (`api_key`,
-  `secret_key`) already supported `DME_API_KEY` and `DME_SECRET_KEY`;
-  this brings the optional fields in line with the same convention.
 - Import support (`tofu import` / `terraform import`) for all twelve
   resources: `dme_domain`, `dme_dns_record`, `dme_template`,
   `dme_template_record`, `dme_contact_list`, `dme_transfer_acl`,
@@ -35,6 +24,20 @@ from upstream git history and flagged. Dates are the upstream Release
   - `dme_failover`: `<record_id>` (the DNS record ID with a failover
     monitor attached)
   - All others: the resource's numeric ID as shown in the DME console.
+- All optional provider configuration fields (`insecure`, `proxy_url`,
+  `base_url`) can now be set via environment variables (`DME_INSECURE`,
+  `DME_PROXY_URL`, `DME_BASE_URL`). The required fields (`api_key`,
+  `secret_key`) already supported `DME_API_KEY` and `DME_SECRET_KEY`;
+  this brings the optional fields in line with the same convention.
+
+### Test improvements
+
+- Sandbox CI acceptance suite via GitHub Actions; domain lifecycle tests
+  run on demand via workflow dispatch with configurable skip option.
+- Acceptance test credentials standardized to `DME_API_KEY` and
+  `DME_SECRET_KEY` (consistent with the provider's own env var names).
+- Per-run unique domain names and fire-and-forget hygiene cleanup prevent
+  stale domain collisions across test runs.
 
 ## v1.1.1 — 2026-05-12
 
