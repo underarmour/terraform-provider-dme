@@ -13,6 +13,7 @@ import (
 
 func TestAccDomainRecords_Basic(t *testing.T) {
 	testAccSkipIfDomainTestsDisabled(t)
+	t.Parallel()
 	dom := testDomain("dns-crud")
 	var record models.ManagedDNSRecordActions
 	resource.Test(t, resource.TestCase{
@@ -33,6 +34,7 @@ func TestAccDomainRecords_Basic(t *testing.T) {
 
 func TestAccDMERecord_Update(t *testing.T) {
 	testAccSkipIfDomainTestsDisabled(t)
+	t.Parallel()
 	dom := testDomain("dns-upd")
 	var a models.ManagedDNSRecordActions
 

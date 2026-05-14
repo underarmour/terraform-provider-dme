@@ -24,6 +24,7 @@ import (
 
 func TestAccImport_Domain(t *testing.T) {
 	testAccSkipIfDomainTestsDisabled(t)
+	t.Parallel()
 	resource.Test(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
@@ -169,6 +170,7 @@ func TestAccImport_FolderRecord(t *testing.T) {
 
 func TestAccImport_DNSRecord(t *testing.T) {
 	testAccSkipIfDomainTestsDisabled(t)
+	t.Parallel()
 	resource.Test(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,

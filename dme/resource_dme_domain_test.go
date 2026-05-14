@@ -13,6 +13,7 @@ import (
 
 func TestAccDomain_Basic(t *testing.T) {
 	testAccSkipIfDomainTestsDisabled(t)
+	t.Parallel()
 	dom := testDomain("dom-basic")
 	var domain models.DomainAttribute
 	resource.Test(t, resource.TestCase{
@@ -33,6 +34,7 @@ func TestAccDomain_Basic(t *testing.T) {
 
 func TestAccDMEDomain_Update(t *testing.T) {
 	testAccSkipIfDomainTestsDisabled(t)
+	t.Parallel()
 	dom := testDomain("dom-upd")
 	var domain models.DomainAttribute
 
