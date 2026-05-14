@@ -1,23 +1,15 @@
 name: release-gate
 on:
-  workflow_dispatch:
-    inputs:
-      reason:
-        description: 'Brief note on why this run was triggered (e.g. pre-v1.2.0 release)'
-        required: false
-        default: 'pre-release validation'
-      skip_domain_tests:
-        description: 'Skip domain lifecycle tests (faster run, no 15-30 min waits)'
-        type: boolean
-        required: false
-        default: true
+  push:
+    tags:
+      - 'v*'
 
 permissions:
   contents: read
 
 jobs:
   full-acceptance:
-    name: Full acceptance suite
+    name: Full acceptance suite (including domain tests)
     runs-on: ubuntu-latest
     timeout-minutes: 90
     env:
@@ -25,7 +17,7 @@ jobs:
       DME_API_KEY: ${{ secrets.DME_SANDBOX_API_KEY }}
       DME_SECRET_KEY: ${{ secrets.DME_SANDBOX_SECRET_KEY }}
       DME_BASE_URL: https://api.sandbox.dnsmadeeasy.com/V2.0
-      DME_SKIP_DOMAIN_TESTS: ${{ inputs.skip_domain_tests && '1' || '' }}
+      # DME_SKIP_DOMAIN_TESTS intentionally absent — full suite required for release
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5

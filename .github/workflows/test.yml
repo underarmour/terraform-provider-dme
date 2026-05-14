@@ -1,57 +1,44 @@
 name: test
 on:
-  push:
-    branches:
-      - master
   pull_request:
     branches:
       - master
-    types: [opened, synchronize, reopened, labeled]
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+    inputs:
+      run_acceptance_tests:
+        description: 'Run acceptance tests against the sandbox'
+        type: boolean
+        required: false
+        default: false
+      skip_domain_tests:
+        description: 'Skip domain lifecycle tests — only applies when acceptance tests are enabled'
+        type: boolean
+        required: false
+        default: true
+
 permissions:
   contents: read
-jobs:
-  unit:
-    name: Unit tests
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
-        with:
-          go-version: '1.26'
-      - name: Run unit tests
-        run: make test
 
-  acceptance:
-    name: Acceptance tests (sandbox)
+jobs:
+  test:
+    name: Test
     runs-on: ubuntu-latest
-    if: |
-      (github.event_name == 'push' && github.ref == 'refs/heads/master') ||
-      (github.event_name == 'pull_request' && github.event.label.name == 'run-acc-tests')
-    permissions:
-      contents: read
-      pull-requests: write
+    timeout-minutes: 120
     env:
-      TF_ACC: "1"
+      # --- test scope ---
+      TF_ACC: ${{ (github.event_name == 'workflow_dispatch' && inputs.run_acceptance_tests == true) && '1' || '' }}
+      DME_SKIP_DOMAIN_TESTS: ${{ (github.event_name != 'workflow_dispatch' || inputs.skip_domain_tests) && '1' || '' }}
+      GO_TEST_TIMEOUT: ${{ (github.event_name == 'workflow_dispatch' && inputs.run_acceptance_tests == true && inputs.skip_domain_tests == false) && '90m' || (github.event_name == 'workflow_dispatch' && inputs.run_acceptance_tests == true) && '30m' || '10m' }}
+
+      # --- sandbox credentials ---
       DME_API_KEY: ${{ secrets.DME_SANDBOX_API_KEY }}
       DME_SECRET_KEY: ${{ secrets.DME_SANDBOX_SECRET_KEY }}
       DME_BASE_URL: https://api.sandbox.dnsmadeeasy.com/V2.0
-      DME_SKIP_DOMAIN_TESTS: "1"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
           go-version: '1.26'
-      - name: Run acceptance tests
-        run: make testacc
-        timeout-minutes: 30
-      - name: Remove trigger label
-        if: always() && github.event_name == 'pull_request'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            github.rest.issues.removeLabel({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              name: 'run-acc-tests'
-            })
+      - name: Run tests
+        run: go test $(go list ./... | grep -v /vendor/) -v -timeout $GO_TEST_TIMEOUT -parallel=4
