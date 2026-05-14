@@ -23,13 +23,13 @@ import (
 // ---------------------------------------------------------------------------
 
 func TestAccImport_Domain(t *testing.T) {
-	testAccSkipIfSandbox(t)
+	testAccSkipIfDomainTestsDisabled(t)
 	resource.Test(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckDMEDomainConfig_basic("tf-acc-import-domain.com", "false"),
+				Config: testAccCheckDMEDomainConfig_basic(testDomain("import-dom"), "false"),
 			},
 			{
 				ResourceName:      "dme_domain.example",
@@ -168,12 +168,12 @@ func TestAccImport_FolderRecord(t *testing.T) {
 // ---------------------------------------------------------------------------
 
 func TestAccImport_DNSRecord(t *testing.T) {
-	testAccSkipIfSandbox(t)
+	testAccSkipIfDomainTestsDisabled(t)
 	resource.Test(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
-			{Config: testAccCheckDMERecordConfig("86400", "tf-acc-import-dns.com")},
+			{Config: testAccCheckDMERecordConfig("86400", testDomain("import-dns"))},
 			{
 				ResourceName:      "dme_dns_record.a1",
 				ImportState:       true,

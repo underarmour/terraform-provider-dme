@@ -12,7 +12,8 @@ import (
 )
 
 func TestAccDomainRecords_Basic(t *testing.T) {
-	testAccSkipIfSandbox(t)
+	testAccSkipIfDomainTestsDisabled(t)
+	dom := testDomain("dns-crud")
 	var record models.ManagedDNSRecordActions
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -20,7 +21,7 @@ func TestAccDomainRecords_Basic(t *testing.T) {
 		CheckDestroy: testAccCheckDMERecordDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckDMERecordConfig_basic("86400"),
+				Config: testAccCheckDMERecordConfig("86400", dom),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckDMERecordExists("dme_domain.domain1", "dme_dns_record.a1", &record),
 					testAccCheckDMERecordAttributes("86400", &record),
@@ -31,7 +32,8 @@ func TestAccDomainRecords_Basic(t *testing.T) {
 }
 
 func TestAccDMERecord_Update(t *testing.T) {
-	testAccSkipIfSandbox(t)
+	testAccSkipIfDomainTestsDisabled(t)
+	dom := testDomain("dns-upd")
 	var a models.ManagedDNSRecordActions
 
 	resource.Test(t, resource.TestCase{
@@ -40,14 +42,14 @@ func TestAccDMERecord_Update(t *testing.T) {
 		CheckDestroy: testAccCheckDMERecordDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckDMERecordConfig_basic("86400"),
+				Config: testAccCheckDMERecordConfig("86400", dom),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckDMERecordExists("dme_domain.domain1", "dme_dns_record.a1", &a),
 					testAccCheckDMERecordAttributes("86500", &a),
 				),
 			},
 			{
-				Config: testAccCheckDMERecordConfig_basic("86500"),
+				Config: testAccCheckDMERecordConfig("86500", dom),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckDMERecordExists("dme_domain.domain1", "dme_dns_record.a1", &a),
 					testAccCheckDMERecordAttributes("86500", &a),
@@ -55,10 +57,6 @@ func TestAccDMERecord_Update(t *testing.T) {
 			},
 		},
 	})
-}
-
-func testAccCheckDMERecordConfig_basic(ttl string) string {
-	return testAccCheckDMERecordConfig(ttl, "tf-acc-dns-crud.com")
 }
 
 func testAccCheckDMERecordConfig(ttl, domain string) string {

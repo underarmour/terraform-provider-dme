@@ -12,7 +12,8 @@ import (
 )
 
 func TestAccDomain_Basic(t *testing.T) {
-	testAccSkipIfSandbox(t)
+	testAccSkipIfDomainTestsDisabled(t)
+	dom := testDomain("dom-basic")
 	var domain models.DomainAttribute
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -20,10 +21,10 @@ func TestAccDomain_Basic(t *testing.T) {
 		CheckDestroy: testAccCheckDMEDomainDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckDMEDomainConfig_basic("tf-acc-dom-basic.com", "false"),
+				Config: testAccCheckDMEDomainConfig_basic(dom, "false"),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckDMEDomainExists("dme_domain.example", &domain),
-					testAccCheckDMEDomainAttributes("tf-acc-dom-basic.com", "false", &domain),
+					testAccCheckDMEDomainAttributes(dom, "false", &domain),
 				),
 			},
 		},
@@ -31,7 +32,8 @@ func TestAccDomain_Basic(t *testing.T) {
 }
 
 func TestAccDMEDomain_Update(t *testing.T) {
-	testAccSkipIfSandbox(t)
+	testAccSkipIfDomainTestsDisabled(t)
+	dom := testDomain("dom-upd")
 	var domain models.DomainAttribute
 
 	resource.Test(t, resource.TestCase{
@@ -40,17 +42,17 @@ func TestAccDMEDomain_Update(t *testing.T) {
 		CheckDestroy: testAccCheckDMEDomainDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckDMEDomainConfig_basic("tf-acc-dom-update.com", "false"),
+				Config: testAccCheckDMEDomainConfig_basic(dom, "false"),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckDMEDomainExists("dme_domain.example", &domain),
-					testAccCheckDMEDomainAttributes("tf-acc-dom-update.com", "false", &domain),
+					testAccCheckDMEDomainAttributes(dom, "false", &domain),
 				),
 			},
 			{
-				Config: testAccCheckDMEDomainConfig_basic("tf-acc-dom-update.com", "true"),
+				Config: testAccCheckDMEDomainConfig_basic(dom, "true"),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckDMEDomainExists("dme_domain.example", &domain),
-					testAccCheckDMEDomainAttributes("tf-acc-dom-update.com", "true", &domain),
+					testAccCheckDMEDomainAttributes(dom, "true", &domain),
 				),
 			},
 		},

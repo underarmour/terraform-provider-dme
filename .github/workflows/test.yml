@@ -35,6 +35,7 @@ jobs:
       DME_API_KEY: ${{ secrets.DME_SANDBOX_API_KEY }}
       DME_SECRET_KEY: ${{ secrets.DME_SANDBOX_SECRET_KEY }}
       DME_BASE_URL: https://api.sandbox.dnsmadeeasy.com/V2.0
+      DME_SKIP_DOMAIN_TESTS: "1"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
