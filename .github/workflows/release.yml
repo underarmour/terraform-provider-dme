@@ -1,44 +1,51 @@
-# This GitHub action can publish assets for release when a tag is created.
-# Currently its setup to run on any tag that matches the pattern "v*" (ie. v0.1.0).
-#
-# This uses an action (paultyng/ghaction-import-gpg) that assumes you set your 
-# private key in the `GPG_PRIVATE_KEY` secret and passphrase in the `PASSPHRASE`
-# secret. If you would rather own your own GPG handling, please fork this action
-# or use an alternative one for key handling.
-#
-# You will need to pass the `--batch` flag to `gpg` in your signing step 
-# in `goreleaser` to indicate this is being used in a non-interactive mode.
-#
 name: release
 on:
   push:
     tags:
       - 'v*'
+
 jobs:
-  goreleaser:
+  validate:
+    name: Full acceptance suite (including domain tests)
     runs-on: ubuntu-latest
+    timeout-minutes: 90
+    permissions:
+      contents: read
+    env:
+      TF_ACC: "1"
+      DME_API_KEY: ${{ secrets.DME_SANDBOX_API_KEY }}
+      DME_SECRET_KEY: ${{ secrets.DME_SANDBOX_SECRET_KEY }}
+      DME_BASE_URL: https://api.sandbox.dnsmadeeasy.com/V2.0
+      # DME_SKIP_DOMAIN_TESTS intentionally absent — full suite required for release
     steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v2
-      -
-        name: Unshallow
-        run: git fetch --prune --unshallow
-      -
-        name: Set up Go
-        uses: actions/setup-go@v5
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+      - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6
         with:
           go-version: '1.26'
-      -
-        name: Import GPG key
+      - name: Run full acceptance suite
+        run: go test $(go list ./... | grep -v /vendor/) -v -timeout 90m -parallel=4
+
+  goreleaser:
+    name: Publish release
+    needs: [validate]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6
+        with:
+          go-version: '1.26'
+      - name: Import GPG key
         id: import_gpg
-        uses: crazy-max/ghaction-import-gpg@v6
+        uses: crazy-max/ghaction-import-gpg@e89d40939c28e39f97cf32126055eeae86ba74ec # v6
         with:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
-      -
-        name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v6
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@1a80836c5c9d9e5755a25cb59ec6f45a3b5f41a8 # v7
         with:
           version: latest
           args: release --clean
