@@ -12,6 +12,7 @@ import (
 )
 
 func TestAccFailover_Basic(t *testing.T) {
+	testAccSkipIfSandbox(t)
 	var failover models.FailoverAttribute
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -30,6 +31,7 @@ func TestAccFailover_Basic(t *testing.T) {
 }
 
 func TestAccDMEFailover_Update(t *testing.T) {
+	testAccSkipIfSandbox(t)
 	var a models.FailoverAttribute
 
 	resource.Test(t, resource.TestCase{

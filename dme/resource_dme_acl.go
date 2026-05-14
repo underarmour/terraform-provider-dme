@@ -82,20 +82,23 @@ func resourceDMEACLRead(d *schema.ResourceData, m interface{}) error {
 		listips = append(listips, id.(string))
 	}
 
+	// Preserve the user-specified ordering when the content matches what the
+	// API returned; otherwise (including post-import when there is no prior
+	// state) write the API-returned list directly.
 	listget := make([]string, 0)
 	if ips, ok := d.GetOk("ips"); ok {
 		listget = toListOfString(ips)
 	}
-	finallist := make([]string, 0)
-	finallist = append(finallist, listget...)
-	log.Println("list of ips: ", listips)
-	log.Println("list of ips: ", listget)
-	log.Println("finallist: ", finallist)
 
-	sort.Strings(listget)
-	sort.Strings(listips)
-	if reflect.DeepEqual(listget, listips) {
-		d.Set("ips", finallist)
+	sortedGet := append([]string(nil), listget...)
+	sortedAPI := append([]string(nil), listips...)
+	sort.Strings(sortedGet)
+	sort.Strings(sortedAPI)
+
+	if len(listget) > 0 && reflect.DeepEqual(sortedGet, sortedAPI) {
+		d.Set("ips", listget)
+	} else {
+		d.Set("ips", listips)
 	}
 	return nil
 }

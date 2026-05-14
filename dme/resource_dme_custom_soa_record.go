@@ -138,12 +138,12 @@ func resourceDmeSOARead(d *schema.ResourceData, m interface{}) error {
 	d.Set("name", StripQuotes(con.S("name").String()))
 	d.Set("email", StripQuotes(con.S("email").String()))
 	d.Set("comp", StripQuotes(con.S("comp").String()))
-	d.Set("ttl", StripQuotes(con.S("ttl").String()))
-	d.Set("retry", StripQuotes(con.S("retry").String()))
-	d.Set("refresh", StripQuotes(con.S("refresh").String()))
-	d.Set("expire", StripQuotes(con.S("expire").String()))
-	d.Set("serial", StripQuotes(con.S("serial").String()))
-	d.Set("negative_cache", StripQuotes(con.S("negativeCache").String()))
+	setIntField(d, "ttl", StripQuotes(con.S("ttl").String()))
+	setIntField(d, "retry", StripQuotes(con.S("retry").String()))
+	setIntField(d, "refresh", StripQuotes(con.S("refresh").String()))
+	setIntField(d, "expire", StripQuotes(con.S("expire").String()))
+	setIntField(d, "serial", StripQuotes(con.S("serial").String()))
+	setIntField(d, "negative_cache", StripQuotes(con.S("negativeCache").String()))
 	return nil
 }
 

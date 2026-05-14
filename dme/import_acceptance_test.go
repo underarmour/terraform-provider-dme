@@ -23,12 +23,14 @@ import (
 // ---------------------------------------------------------------------------
 
 func TestAccImport_Domain(t *testing.T) {
+	testAccSkipIfDomainTestsDisabled(t)
+	t.Parallel()
 	resource.Test(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckDMEDomainConfig_basic("import-test-domain.com", "false"),
+				Config: testAccCheckDMEDomainConfig_basic(testDomain("import-dom"), "false"),
 			},
 			{
 				ResourceName:      "dme_domain.example",
@@ -115,6 +117,7 @@ func TestAccImport_VanityNameserver(t *testing.T) {
 }
 
 func TestAccImport_SecondaryDNS(t *testing.T) {
+	testAccSkipIfSandbox(t)
 	resource.Test(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
@@ -130,6 +133,7 @@ func TestAccImport_SecondaryDNS(t *testing.T) {
 }
 
 func TestAccImport_SecondaryIPSet(t *testing.T) {
+	testAccSkipIfSandbox(t)
 	resource.Test(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
@@ -145,6 +149,7 @@ func TestAccImport_SecondaryIPSet(t *testing.T) {
 }
 
 func TestAccImport_FolderRecord(t *testing.T) {
+	testAccSkipIfSandbox(t)
 	resource.Test(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
@@ -164,11 +169,13 @@ func TestAccImport_FolderRecord(t *testing.T) {
 // ---------------------------------------------------------------------------
 
 func TestAccImport_DNSRecord(t *testing.T) {
+	testAccSkipIfDomainTestsDisabled(t)
+	t.Parallel()
 	resource.Test(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
-			{Config: testAccCheckDMERecordConfig_basic("86400")},
+			{Config: testAccCheckDMERecordConfig("86400", testDomain("import-dns"))},
 			{
 				ResourceName:      "dme_dns_record.a1",
 				ImportState:       true,
@@ -222,6 +229,7 @@ func TestAccImport_TemplateRecord(t *testing.T) {
 }
 
 func TestAccImport_Failover(t *testing.T) {
+	testAccSkipIfSandbox(t)
 	resource.Test(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,

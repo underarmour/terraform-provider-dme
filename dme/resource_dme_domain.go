@@ -3,6 +3,8 @@ package dme
 import (
 	"fmt"
 	"log"
+	"strings"
+	"time"
 
 	"github.com/DNSMadeEasy/dme-go-client/models"
 
@@ -188,7 +190,32 @@ func resourceDMEDomainDelete(d *schema.ResourceData, m interface{}) error {
 	dmeClient := m.(*client.Client)
 	dn := d.Id()
 
-	err := dmeClient.Delete("dns/managed/" + dn)
+	// DME domains enter a "pending" state after create/delete operations and
+	// cannot be deleted until they exit it. Poll with exponential backoff
+	// (5s→10s→20s→40s, capped at 60s) to catch fast cases quickly while
+	// staying well within the 150 req/5 min rate limit across parallel tests.
+	// 30 attempts covers up to ~28 minutes in the worst case.
+	var err error
+	sleep := 5 * time.Second
+	const maxSleep = 60 * time.Second
+	const maxAttempts = 30
+	for i := 0; i < maxAttempts; i++ {
+		err = dmeClient.Delete("dns/managed/" + dn)
+		if err == nil {
+			break
+		}
+		if !strings.Contains(err.Error(), "pending") {
+			break
+		}
+		log.Printf("[DEBUG] domain %s pending, retrying delete in %s (attempt %d/%d)", dn, sleep, i+1, maxAttempts)
+		time.Sleep(sleep)
+		if sleep < maxSleep {
+			sleep *= 2
+			if sleep > maxSleep {
+				sleep = maxSleep
+			}
+		}
+	}
 	if err != nil {
 		return err
 	}

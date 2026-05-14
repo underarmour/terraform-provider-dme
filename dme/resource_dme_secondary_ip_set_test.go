@@ -12,6 +12,7 @@ import (
 )
 
 func TestAccSecondaryIPSet_Basic(t *testing.T) {
+	testAccSkipIfSandbox(t)
 	var secondIP models.SecondaryIPSet
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -30,6 +31,7 @@ func TestAccSecondaryIPSet_Basic(t *testing.T) {
 }
 
 func TestAccDMESecondaryIPSet_Update(t *testing.T) {
+	testAccSkipIfSandbox(t)
 	var secondIP models.SecondaryIPSet
 
 	resource.Test(t, resource.TestCase{

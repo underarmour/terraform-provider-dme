@@ -159,11 +159,50 @@ Total: 43 unit tests. Additionally, 12 `TestAccImport_*` acceptance
 tests in `dme/import_acceptance_test.go` exercise import end-to-end
 against a live DME account (require `TF_ACC=1`).
 
-To exercise the existing acceptance suite against a real DME
-account:
+### Sandbox and CI acceptance testing
+
+DME provides a publicly available sandbox environment at
+`sandbox.dnsmadeeasy.com`. The provider's `base_url` config attribute
+(inherited from upstream v1.0.7) accepts an alternate API endpoint,
+making it straightforward to point the entire provider — and the
+acceptance test suite — at the sandbox instead of production:
+
+```hcl
+provider "dme" {
+  api_key    = var.dme_api_key
+  secret_key = var.dme_secret_key
+  base_url   = "https://api.sandbox.dnsmadeeasy.com/V2.0"
+}
+```
+
+**Sandbox account setup (one-time, manual):**
+1. Create an account at `sandbox.dnsmadeeasy.com` (standard web signup).
+2. Generate API credentials from the sandbox account settings.
+3. Store them as GitHub Actions secrets: `DME_SANDBOX_API_KEY` and
+   `DME_SANDBOX_SECRET_KEY`.
+
+Once credentials are provisioned, the acceptance suite runs fully
+automated in CI via the `test.yml` workflow (see `.github/workflows/`).
+The acceptance tests create and destroy their own fixtures; no
+pre-existing sandbox zones are required.
+
+To run the acceptance suite locally against the sandbox:
 
 ```sh
-TF_ACC=1 DME_API_KEY=... DME_SECRET_KEY=... make testacc
+TF_ACC=1 \
+  DME_API_KEY=<sandbox-key> \
+  DME_SECRET_KEY=<sandbox-secret> \
+  DME_BASE_URL=https://api.sandbox.dnsmadeeasy.com/V2.0 \
+  make testacc
+```
+
+To run against a real production DME account:
+
+```sh
+TF_ACC=1 \
+  DME_API_KEY=<prod-key> \
+  DME_SECRET_KEY=<prod-secret> \
+  make testacc
 ```
 
 ## Build

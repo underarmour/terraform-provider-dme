@@ -12,6 +12,7 @@ import (
 )
 
 func TestAccFolder_Basic(t *testing.T) {
+	testAccSkipIfSandbox(t)
 	var folder models.Folder
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -30,6 +31,7 @@ func TestAccFolder_Basic(t *testing.T) {
 }
 
 func TestAccDmeFolder_Update(t *testing.T) {
+	testAccSkipIfSandbox(t)
 	var folder models.Folder
 
 	resource.Test(t, resource.TestCase{

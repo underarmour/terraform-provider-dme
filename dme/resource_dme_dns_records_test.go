@@ -12,6 +12,9 @@ import (
 )
 
 func TestAccDomainRecords_Basic(t *testing.T) {
+	testAccSkipIfDomainTestsDisabled(t)
+	t.Parallel()
+	dom := testDomain("dns-crud")
 	var record models.ManagedDNSRecordActions
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -19,7 +22,7 @@ func TestAccDomainRecords_Basic(t *testing.T) {
 		CheckDestroy: testAccCheckDMERecordDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckDMERecordConfig_basic("86400"),
+				Config: testAccCheckDMERecordConfig("86400", dom),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckDMERecordExists("dme_domain.domain1", "dme_dns_record.a1", &record),
 					testAccCheckDMERecordAttributes("86400", &record),
@@ -30,6 +33,9 @@ func TestAccDomainRecords_Basic(t *testing.T) {
 }
 
 func TestAccDMERecord_Update(t *testing.T) {
+	testAccSkipIfDomainTestsDisabled(t)
+	t.Parallel()
+	dom := testDomain("dns-upd")
 	var a models.ManagedDNSRecordActions
 
 	resource.Test(t, resource.TestCase{
@@ -38,14 +44,14 @@ func TestAccDMERecord_Update(t *testing.T) {
 		CheckDestroy: testAccCheckDMERecordDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckDMERecordConfig_basic("86400"),
+				Config: testAccCheckDMERecordConfig("86400", dom),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckDMERecordExists("dme_domain.domain1", "dme_dns_record.a1", &a),
 					testAccCheckDMERecordAttributes("86500", &a),
 				),
 			},
 			{
-				Config: testAccCheckDMERecordConfig_basic("86500"),
+				Config: testAccCheckDMERecordConfig("86500", dom),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckDMERecordExists("dme_domain.domain1", "dme_dns_record.a1", &a),
 					testAccCheckDMERecordAttributes("86500", &a),
@@ -55,10 +61,10 @@ func TestAccDMERecord_Update(t *testing.T) {
 	})
 }
 
-func testAccCheckDMERecordConfig_basic(ttl string) string {
+func testAccCheckDMERecordConfig(ttl, domain string) string {
 	return fmt.Sprintf(`
 	resource "dme_domain" "domain1" {
-		name = "practicerecord2.com"
+		name = "%s"
 	}
 
 	resource "dme_dns_record" "a1"{
@@ -68,7 +74,7 @@ func testAccCheckDMERecordConfig_basic(ttl string) string {
 		type = "A"
 		value = "1.2.3.4"
 	}
-	`, ttl)
+	`, domain, ttl)
 }
 
 func testAccCheckDMERecordExists(domainName string, name string, model *models.ManagedDNSRecordActions) resource.TestCheckFunc {
