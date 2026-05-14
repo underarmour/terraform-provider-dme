@@ -26,8 +26,8 @@ Changes from upstream v1.0.8:
 - **Import support** added for all 12 resources via `terraform import`.
 - **43 unit tests** added; upstream shipped zero.
 
-The fork has not yet been tagged or published to a registry. Consumers
-use the filesystem mirror path described in the Consumer wiring section.
+The fork is not yet published to a registry. Consumers use the
+filesystem mirror path described in the Consumer wiring section.
 
 ## Upstream lineage
 
@@ -89,6 +89,37 @@ The root cause of the data source bugs being missed in the initial fix:
 resource and data source Read functions duplicate the same
 field-population logic with no shared helper. A `populateXxxFromContainer`
 refactor is tracked under Known limitations.
+
+### Additional read-path fixes (import-driven)
+
+Surfaced by import exercising the read path without prior state:
+
+- **`dme_transfer_acl` `ips`**: only written to state when it matched
+  prior state; on import there is no prior state so it was always empty.
+  Now always written from the API response.
+- **`dme_custom_soa_record` int fields** (`ttl`, `refresh`, `retry`,
+  `expire`, `negative_cache`, `serial`): set via `d.Set` with string
+  values; the SDK silently discards strings for `TypeInt` attributes.
+  Fixed with a `setIntField` helper that converts before setting.
+- **`dme_vanity_nameserver_record`**: `servers` was set as a raw JSON
+  string instead of a `TypeList`; `public_config`/`default_config` as
+  strings instead of booleans; `name_server_group_id` as a string
+  instead of an integer. All fixed.
+
+### Optional provider fields via environment variables
+
+`insecure`, `proxy_url`, and `base_url` now have `DefaultFunc` set to
+read `DME_INSECURE`, `DME_PROXY_URL`, and `DME_BASE_URL` respectively.
+Consistent with the existing `DME_API_KEY`/`DME_SECRET_KEY` convention
+on the required fields. Upstream has no env var support for these.
+
+### Domain delete retry
+
+Upstream `resourceDMEDomainDelete` issues a single DELETE and returns
+any error. DME places domains in a "pending" state after create or
+delete, during which a subsequent DELETE is rejected. The fork retries
+with exponential backoff (5s initial, doubling, 60s cap, 30 attempts)
+until the delete is accepted or the retry budget is exhausted.
 
 ### Import support
 
@@ -181,8 +212,16 @@ provider "dme" {
 3. Store them as GitHub Actions secrets: `DME_SANDBOX_API_KEY` and
    `DME_SANDBOX_SECRET_KEY`.
 
-Once credentials are provisioned, the acceptance suite runs fully
-automated in CI via the `test.yml` workflow (see `.github/workflows/`).
+Once credentials are provisioned, the `test.yml` workflow handles CI:
+- **PR pushes**: unit tests only.
+- **Manual dispatch** (`workflow_dispatch`): acceptance tests, with
+  `run_acceptance_tests` (default: off) and `skip_domain_tests`
+  (default: on) inputs. Uncheck `skip_domain_tests` for the full suite.
+
+Domain lifecycle tests are excluded from automated PR runs because DME
+domain create/delete is async with no guaranteed timing (15-30 min
+observed). They run via dispatch or the release gate.
+
 The acceptance tests create and destroy their own fixtures; no
 pre-existing sandbox zones are required.
 
@@ -227,8 +266,9 @@ fork's toolchain:
   explicitly ignored). Produces zip archives plus a signed
   `SHA256SUMS` file matching the layout the OpenTofu and Terraform
   Registries expect.
-- `.github/workflows/release.yml` triggers on `v*` tags and runs
-  GoReleaser. GPG signing handled via
+- `.github/workflows/release.yml` triggers on `v*` tags. A `validate`
+  job runs the full acceptance suite first; GoReleaser only runs if
+  `validate` passes (`needs: [validate]`). GPG signing handled via
   `crazy-max/ghaction-import-gpg`, consuming `GPG_PRIVATE_KEY` and
   `PASSPHRASE` repo secrets; the import step exposes a fingerprint
   to GoReleaser via `GPG_FINGERPRINT`. GPG key generation and
